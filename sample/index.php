@@ -16,6 +16,6 @@
 </head>
 <body>
 <p>Scrupload demo.</p>
-<div id="upload_button"></div>
+<div id="upload_button"><img src="/img/upload.gif" /></div>
 </body>
 </html>

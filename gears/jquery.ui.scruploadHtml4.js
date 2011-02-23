@@ -6,29 +6,40 @@ $.widget('ui.scruploadHtml4', {
 	_create: function()
 	{
 		var self = this;
-		var img = $('<img src="'+self.options.button_image+'">');
-		img.appendTo(self.element);
+		var button = self.element.find(':first-child');
+		button.css("cursor", "pointer");
 		
-		var form = $('<form action="" method="post" enctype="multipart/form-data" />');
-		form.appendTo(self.element)
-			.css("overflow", "hidden")
-			.css("position", "absolute")
-			.width(img.width())
-			.height(img.height())
-			.offset(img.offset())
-			;
-		
-		var input = $('<input type="file" name="file" />');
-		input.appendTo(form)
-			.attr("size", 1)
-			.css("font-size", img.height())
-			.width("100%")
-			.height("100%")
-			//.css("filter", "alpha(opacity=0)")
-			//.css("-moz-opacity", "0")
-			//.css("opacity", "0")
-			;
-		
+		$(window).bind('load', function() {
+			var form = $('<form action="" method="post" enctype="multipart/form-data" />');
+			form.appendTo("body")
+				.css("overflow", "hidden")
+				.css("position", "absolute")
+				.css("cursor", "pointer")
+				.width(button.width())
+				.height(button.height())
+				.offset(button.offset())
+				;
+			
+			var input = $('<input type="file" name="file" />');
+			input.appendTo(form)
+				.attr("size", 1)
+				.css("font-size", button.height())
+				.css("cursor", "pointer")
+				.width("100%")
+				.height("100%")
+				//.css("filter", "alpha(opacity=0)")
+				//.css("-moz-opacity", "0")
+				//.css("opacity", "0")
+				;
+			var default_os = input.offset();
+			var offset_top = input.height() / 2;
+			var offset_left = (input.width() / 4) * 3;
+			form.mousemove(function(event){
+				input.offset({top: event.clientY - offset_top, left: event.clientX - offset_left});
+			}).mouseout(function(){
+				input.offset(default_os);
+			});
+		});
 	},
 	destroy: function()
 	{
