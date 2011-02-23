@@ -24,14 +24,10 @@ $.widget('ui.scruploadHtml4', {
 			.css("font-size", img.height())
 			.width("100%")
 			.height("100%")
-			.css("filter", "alpha(opacity=0)")
-			.css("-moz-opacity", "0")
-			.css("opacity", "0")
+			//.css("filter", "alpha(opacity=0)")
+			//.css("-moz-opacity", "0")
+			//.css("opacity", "0")
 			;
-		
-		img.click(function(event){
-			input.click();
-		});
 		
 	},
 	destroy: function()
