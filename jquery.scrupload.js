@@ -19,4 +19,11 @@ scr.uniqid = function()
 	return result.join('') + new Date().getTime();
 };
 
+scr.buildUrlQuery = function(url, params)
+{
+	var q = $.param(params);
+	return q.indexOf("?") != -1 ? url+"&"+q : url+"?"+q;
+};
+
+
 })(jQuery, (function(){ return this; })());

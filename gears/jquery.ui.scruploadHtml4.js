@@ -2,16 +2,17 @@
 $.widget('ui.scruploadHtml4', {
 	options: {
 		html4_use_input: false,
-		post_params: {}
+		post_params: {},
+		get_params: {}
 	},
 	_create: function()
 	{
 		var self = this;
 		
-		self._queue_array = [];
+		self.queue_array = [];
 		
-		self._button = self.element.children();
-		if(self._button.length < 1)
+		self.button = self.element.children();
+		if(self.button.length < 1)
 		{
 			throw 'More than one element in target.';
 		}
@@ -21,8 +22,6 @@ $.widget('ui.scruploadHtml4', {
 			self._initInterface();
 			self._trigger('onInit', null, {button: self.element});
 		});
-		
-		
 	},
 	_initInterface: function()
 	{
@@ -31,11 +30,11 @@ $.widget('ui.scruploadHtml4', {
 		{
 			var form = self._createFormAndInput();
 			form.appendTo(self.element);
-			self._button.hide();
+			self.button.hide();
 		}
 		else
 		{
-			self._initFormForButton(self._button);
+			self._initFormForButton(self.button);
 		}
 	},
 	_initFormForButton: function(button)
@@ -75,16 +74,16 @@ $.widget('ui.scruploadHtml4', {
 	_createFormAndInput: function()
 	{
 		var self = this;
-		self._form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />');
-		self._form.appendTo(self.element);
+		
+		self.form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />');
+		self.form.appendTo(self.element);
 		
 		var input = $('<input type="file" name="file" />');
-		self._form.append(input);
+		self.form.append(input);
 		
 		input.change(function(){
 			
 			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
-			
 			var filename = 'n/a';
 			if(this.value)
 			{
@@ -103,13 +102,37 @@ $.widget('ui.scruploadHtml4', {
 				status: scrupload.SELECTED
 			};
 			
-			self._queue_array.push(file);
-			self._trigger('onSelect', null, {button: self.element, file: file});
+			self.queue_array.push(file);
+			
+			var get = $.extend({}, self.options.get_params);
+			var post = $.extend({}, self.options.post_params);
+			self._trigger('onSelect', null, {
+				button: self.element,
+				file: file,
+				get: get,
+				post: post
+			});
+			
+			self.form.submit(function(){
+				self._trigger('onStart', null, {
+					button: self.element,
+					file: file,
+					get: get,
+					post: post
+				});
+				
+				$.each(post, function(key){
+					self.form.append('<input type="hidden" name="'+key+'" value="'+this+'" />');
+				});
+				
+				var url = self.form.attr("action");
+				url = scrupload.buildUrlQuery(url, get);
+				self.form.attr('action', url);
+			});
 			
 			//upload
-			file.status = scrupload.UPLOADING;
-			self._form.attr('target', file.id);
-			self._form.find('input[name=id]').val(file.id);
+			self.form.attr('target', file.id);
+			self.form.find('input[name=id]').val(file.id);
 			$('<iframe src="about:blank" name="' + file.id + '">')
 				.appendTo(document.body)
 				.css({width: '1px', height: '1px', position: 'absolute', left: '-10000px', top: '-10000px'})
@@ -118,7 +141,18 @@ $.widget('ui.scruploadHtml4', {
 					var resp = $(this.contentWindow.document.body).text();
 					if (resp)
 					{
-						alert(resp);
+						self._trigger('onProgress', null, {
+							button: self.element,
+							file: file,
+							progress: {loaded_bytes:'n/a', total_bytes: 'n/a', percent: 100}
+						});
+						
+						file.status = scrupload.DONE;
+						self._trigger('onComplete', null, {
+							button: self.element,
+							file: file,
+							response: resp
+						});
 					}
 					
 					setTimeout(function(){
@@ -127,15 +161,16 @@ $.widget('ui.scruploadHtml4', {
 					}, 0);
 				});
 			
-			self._form.submit().remove();
+			self.form.submit().remove();
+			file.status = scrupload.UPLOADING;
+			self._trigger('onProgress', null, {
+				button: self.element,
+				file: file,
+				progress: {loaded_bytes:'n/a', total_bytes: 'n/a', percent: 0}
+			});
 		});
 		
-		self._form.append('<input type="hidden" name="id" value="" />');
-		$.each(self.options.post_params, function(key){
-			self._form.append('<input type="hidden" name="'+key+'" value="'+this+'" />');
-		});
-		
-		return self._form;
+		return self.form;
 	},
 	destroy: function()
 	{
