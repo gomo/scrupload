@@ -9,8 +9,8 @@
 	<script type="text/javascript">
 		$(function(){
 			$("#upload_button").scruploadHtml4({
-				html4_use_input: true
-				
+				//html4_use_input: true,
+				url: '/scrupload/upload.php'
 			});
 		});
 	</script>
