@@ -1,21 +1,20 @@
 (function($){
 $.widget('ui.scruploadHtml4', {
-	options: {
-		html4_use_input: false,
-		post_params: {},
-		get_params: {}
-	},
+	options: scrupload.defaultOptions({
+		html4_use_input: false
+	}),
 	_create: function()
 	{
 		var self = this;
-		
-		self.queue_array = [];
 		
 		self.button = self.element.children();
 		if(self.button.length < 1)
 		{
 			throw 'More than one element in target.';
 		}
+		
+		self.queue_array = [];
+		self.post = scrupload.buildDefaultPostParams(self.options);
 		
 		//chromeが画像のサイズを取得できなかった。
 		$(window).bind('load', function() {
@@ -44,6 +43,7 @@ $.widget('ui.scruploadHtml4', {
 		var form = self._createFormAndInput()
 			.css("overflow", "hidden")
 			.css("cursor", "pointer")
+			.css("position", "absolute")
 			.width(button.width())
 			.height(button.height())
 			.offset(button.offset())
@@ -95,38 +95,51 @@ $.widget('ui.scruploadHtml4', {
 				}	
 			}
 			
+			if(filename != 'n/a')
+			{
+				if(!scrupload.checkTypes(self.options.types, filename))
+				{
+					self._trigger('onError', null, {
+						button: self.element
+						//TODO error type
+					});
+					self._resetInterface();
+					
+					return;
+				}
+			}
+			
 			var file = {
 				id : scrupload.uniqid(),
 				time: new Date(),
 				filename: filename,
-				status: scrupload.SELECTED
+				status: scrupload.SELECTED,
+				get: $.extend({}, self.options.get_params),
+				post: $.extend({}, self.post)
 			};
 			
 			self.queue_array.push(file);
 			
-			var get = $.extend({}, self.options.get_params);
-			var post = $.extend({}, self.options.post_params);
 			self._trigger('onSelect', null, {
 				button: self.element,
-				file: file,
-				get: get,
-				post: post
+				file: file
 			});
 			
 			self.form.submit(function(){
-				self._trigger('onStart', null, {
+				/*self._trigger('onStart', null, {
 					button: self.element,
-					file: file,
-					get: get,
-					post: post
-				});
+					file: file
+				});*/
 				
-				$.each(post, function(key){
+				//post params
+				file.post.id = file.id;
+				$.each(file.post, function(key){
 					self.form.append('<input type="hidden" name="'+key+'" value="'+this+'" />');
 				});
 				
+				//get params
 				var url = self.form.attr("action");
-				url = scrupload.buildUrlQuery(url, get);
+				url = scrupload.buildUrlQuery(url, file.get);
 				self.form.attr('action', url);
 			});
 			
@@ -144,33 +157,44 @@ $.widget('ui.scruploadHtml4', {
 						self._trigger('onProgress', null, {
 							button: self.element,
 							file: file,
-							progress: {loaded_bytes:'n/a', total_bytes: 'n/a', percent: 100}
+							progress: {percent: 100}
 						});
 						
 						file.status = scrupload.DONE;
-						self._trigger('onComplete', null, {
+						self._trigger('onFileComplete', null, {
 							button: self.element,
 							file: file,
 							response: resp
+						});
+						
+						//html4は一個しかアップロードできないので同義
+						self._trigger('onComplete', null, {
+							button: self.element,
+							files: self.queue_array
 						});
 					}
 					
 					setTimeout(function(){
 						iframe.remove();
-						self._initInterface();
+						self._resetInterface();
 					}, 0);
 				});
 			
-			self.form.submit().remove();
+			self.form.submit();
 			file.status = scrupload.UPLOADING;
 			self._trigger('onProgress', null, {
 				button: self.element,
 				file: file,
-				progress: {loaded_bytes:'n/a', total_bytes: 'n/a', percent: 0}
+				progress: {percent: 0}
 			});
 		});
 		
 		return self.form;
+	},
+	_resetInterface:function()
+	{
+		this.form.remove();
+		this._initInterface();
 	},
 	destroy: function()
 	{

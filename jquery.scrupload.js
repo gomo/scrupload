@@ -25,5 +25,48 @@ scr.buildUrlQuery = function(url, params)
 	return q.indexOf("?") != -1 ? url+"&"+q : url+"?"+q;
 };
 
+scr.getElementId = function(element)
+{
+	var id = element.attr('id');
+	if(id)
+	{
+		return id;
+	}
+	
+	while(true)
+	{
+		id = this.uniqid();
+		if($('#'+id).length === 0)
+		{
+			element.attr("id", id);
+			return id;
+		}
+	}
+};
+
+scr.buildDefaultPostParams = function(options){
+	var post = $.extend({}, options.post_params);
+	post.types = options.types;
+	
+	if(options.size_limit)
+	{
+		post.size_limit = options.size_limit;
+	}
+
+	return post;
+};
+
+scr.checkTypes = function(types, filename){
+	return true;
+};
+
+scr.defaultOptions = function(options){
+	return $.extend({}, {
+		post_params: {},
+		get_params: {},
+		types: ["*.*"]
+	}, options||{});
+};
+
 
 })(jQuery, (function(){ return this; })());
