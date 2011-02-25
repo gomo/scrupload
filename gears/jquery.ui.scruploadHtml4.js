@@ -200,7 +200,8 @@ $.widget('ui.scruploadHtml4', {
 	{
 		this._form.remove();
 		this._button.show();
-		this._queue_array = [];
+		this.queue_array = [];
+		this.self.post = {};
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;
 	}
