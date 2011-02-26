@@ -114,12 +114,27 @@ $.widget('ui.scruploadHtml4', {
 						button: self.element,
 						file: file,
 						error: scrupload.ERROR_TYPE,
-						types: self.options.types
+						options: self.options
 					});
 					self._resetInterface();
 					
 					return;
 				}
+			}
+			
+			//queue_limitのチェック
+			if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
+			{
+				file.status = scrupload.FAILED;
+				self._trigger('onError', null, {
+					button: self.element,
+					file: file,
+					error: scrupload.ERROR_QUEUE_LIMIT,
+					options: self.options
+				});
+				self._resetInterface();
+				
+				return;
 			}
 			
 			self.queue_array.push(file);

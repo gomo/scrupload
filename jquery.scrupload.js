@@ -14,7 +14,7 @@ scr.DONE = 4;
 
 scr.ERROR_TYPE = 10;
 scr.ERROR_SIZE_LIMIT = 11;
-scr.ERROR_SERVER = 12;
+scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function()
 {
@@ -93,8 +93,7 @@ scr.checkTypes = function(types, filename){
 scr.defaultOptions = function(options){
 	return $.extend({}, {
 		post_params: {},
-		get_params: {},
-		type_reg: ".*"
+		get_params: {}
 	}, options||{});
 };
 
