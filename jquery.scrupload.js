@@ -1,11 +1,20 @@
 (function($, g){
 
+if(g.scrupload )
+{
+	return;
+}
+	
 var scr = g.scrupload = g.scrupload||{};
 
 scr.QUEUED = 1;
 scr.UPLOADING = 2;
 scr.FAILED = 3;
 scr.DONE = 4;
+
+scr.ERROR_TYPE = 10;
+scr.ERROR_SIZE_LIMIT = 11;
+scr.ERROR_SERVER = 12;
 
 scr.uniqid = function()
 {
@@ -25,7 +34,7 @@ scr.buildUrlQuery = function(url, params)
 	return q.indexOf("?") != -1 ? url+"&"+q : url+"?"+q;
 };
 
-scr.getElementId = function(element)
+scr.generateElementId = function(element)
 {
 	var id = element.attr('id');
 	if(id)
@@ -44,6 +53,11 @@ scr.getElementId = function(element)
 	}
 };
 
+/**
+ * optionsの中で強制的にpostするもの
+ * @param options
+ * @returns
+ */
 scr.buildDefaultPostParams = function(options){
 	var post = $.extend({}, options.post_params);
 	post.types = options.types;
@@ -56,15 +70,31 @@ scr.buildDefaultPostParams = function(options){
 	return post;
 };
 
+/**
+ * 拡張子をチェックする
+ * @param types
+ * @param filename
+ * @returns {Boolean}
+ */
 scr.checkTypes = function(types, filename){
-	return true;
+	
+	var list = types.split("|");
+	for(var i=0; i<list.length; i++)
+	{
+		if(filename.toLowerCase().lastIndexOf(list[i].toLowerCase()) == filename.length - list[i].length)
+		{
+			return true;
+		}
+	}
+	
+	return false;
 };
 
 scr.defaultOptions = function(options){
 	return $.extend({}, {
 		post_params: {},
 		get_params: {},
-		types: ["*.*"]
+		type_reg: ".*"
 	}, options||{});
 };
 

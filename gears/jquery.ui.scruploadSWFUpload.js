@@ -6,7 +6,7 @@ $.widget('ui.scruploadSWFUpload', {
 	_create: function()
 	{
 		var self = this;
-		var button_id = scrupload.getElementId(self.element);
+		var button_id = scrupload.generateElementId(self.element);
 		console.info(button_id);
 	},
 	destroy: function()

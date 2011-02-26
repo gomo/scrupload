@@ -95,20 +95,6 @@ $.widget('ui.scruploadHtml4', {
 				}	
 			}
 			
-			if(filename != 'n/a')
-			{
-				if(!scrupload.checkTypes(self.options.types, filename))
-				{
-					self._trigger('onError', null, {
-						button: self.element
-						//TODO error type
-					});
-					self._resetInterface();
-					
-					return;
-				}
-			}
-			
 			var file = {
 				id : scrupload.uniqid(),
 				time: new Date(),
@@ -118,6 +104,24 @@ $.widget('ui.scruploadHtml4', {
 				post: $.extend({}, self.post)
 			};
 			
+			//file typeのチェック
+			if(filename != 'n/a')
+			{
+				if(!scrupload.checkTypes(self.options.types, filename))
+				{
+					file.status = scrupload.FAILED;
+					self._trigger('onError', null, {
+						button: self.element,
+						file: file,
+						error: scrupload.ERROR_TYPE,
+						types: self.options.types
+					});
+					self._resetInterface();
+					
+					return;
+				}
+			}
+			
 			self.queue_array.push(file);
 			
 			self._trigger('onSelect', null, {
@@ -126,11 +130,6 @@ $.widget('ui.scruploadHtml4', {
 			});
 			
 			self.form.submit(function(){
-				/*self._trigger('onStart', null, {
-					button: self.element,
-					file: file
-				});*/
-				
 				//post params
 				file.post.id = file.id;
 				$.each(file.post, function(key){

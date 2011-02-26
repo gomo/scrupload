@@ -16,7 +16,7 @@
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
-				types: ["*.jpg"],
+				types: "jpg|jpeg|gif|png|bmp",
 				select_limit: 1,
 				queue_limit: 3,
 				onInit: function(event, ui)
@@ -42,6 +42,10 @@
 				onComplete: function(event, ui)
 				{
 					console.info('complete', ui);
+				},
+				onError: function(event, ui)
+				{
+					console.info('error', ui);
 				}
 			});
 
@@ -52,7 +56,7 @@
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
-				types: ["*.jpg"],
+				types: "jpg|gif|png|bmp",
 				select_limit: 1,
 				queue_limit: 3,
 				onInit: function(event, ui)
