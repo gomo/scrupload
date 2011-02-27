@@ -113,7 +113,7 @@ scr.initButtonEvent = function(widget, element){
 		if(mouseover)
 		{;
 		widget._trigger('onButtonOut', null, {
-				button: widget.element,
+				element: widget.element,
 				options: widget.options
 			});
 			mouseover = false;
@@ -122,14 +122,14 @@ scr.initButtonEvent = function(widget, element){
 		if(!mouseover)
 		{
 			widget._trigger('onButtonOver', null, {
-				button: widget.element,
-				options: self.options
+				element: widget.element,
+				options: widget.options
 			});
 			mouseover = true;
 		}
 	}).mousedown(function(){
 		widget._trigger('onButtonDown', null, {
-			button: widget.element,
+			element: widget.element,
 			options: widget.options
 		});
 	});

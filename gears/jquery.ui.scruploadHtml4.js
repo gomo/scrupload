@@ -17,7 +17,7 @@ $.widget('ui.scruploadHtml4', {
 		$(window).bind('load', function() {
 			self._initInterface();
 			self._trigger('onInit', null, {
-				button: self.element,
+				element: self.element,
 				gear: 'html4',
 				options: self.options
 			});
@@ -40,7 +40,6 @@ $.widget('ui.scruploadHtml4', {
 	_initFormForButton: function(button)
 	{
 		var self = this;
-		
 		var form = self._createFormAndInput()
 			.css("overflow", "hidden")
 			.css("cursor", "pointer")
@@ -73,7 +72,7 @@ $.widget('ui.scruploadHtml4', {
 			input.offset(default_os);
 		});
 		
-		scrupload.initButtonEvent(self, form);
+		$(window).resize(function(){self.replace();});
 	},
 	_createFormAndInput: function()
 	{
@@ -109,7 +108,7 @@ $.widget('ui.scruploadHtml4', {
 				{
 					file.status = scrupload.FAILED;
 					self._trigger('onError', null, {
-						button: self.element,
+						element: self.element,
 						file: file,
 						error: scrupload.ERROR_TYPE,
 						options: self.options
@@ -125,7 +124,7 @@ $.widget('ui.scruploadHtml4', {
 			{
 				file.status = scrupload.FAILED;
 				self._trigger('onError', null, {
-					button: self.element,
+					element: self.element,
 					file: file,
 					error: scrupload.ERROR_QUEUE_LIMIT,
 					options: self.options
@@ -138,7 +137,7 @@ $.widget('ui.scruploadHtml4', {
 			self.queue_array.push(file);
 			
 			self._trigger('onSelect', null, {
-				button: self.element,
+				element: self.element,
 				file: file
 			});
 			
@@ -156,7 +155,7 @@ $.widget('ui.scruploadHtml4', {
 				
 				file.status = scrupload.UPLOADING;
 				self._trigger('onProgress', null, {
-					button: self.element,
+					element: self.element,
 					file: file,
 					progress: {percent: 0}
 				});
@@ -174,21 +173,21 @@ $.widget('ui.scruploadHtml4', {
 					if (resp)
 					{
 						self._trigger('onProgress', null, {
-							button: self.element,
+							element: self.element,
 							file: file,
 							progress: {percent: 100}
 						});
 						
 						file.status = scrupload.DONE;
 						self._trigger('onFileComplete', null, {
-							button: self.element,
+							element: self.element,
 							file: file,
 							response: resp
 						});
 						
 						//html4は一個しかアップロードできないので同義
 						self._trigger('onComplete', null, {
-							button: self.element,
+							element: self.element,
 							uploaded: [file],
 							files: self.queue_array
 						});
@@ -203,7 +202,16 @@ $.widget('ui.scruploadHtml4', {
 			self.form.submit();
 		});
 		
+		scrupload.initButtonEvent(self, self.form);
+		
 		return self.form;
+	},
+	replace: function()
+	{
+		if(this.form)
+		{
+			this.form.offset(this.element.offset());
+		}
 	},
 	_resetInterface:function()
 	{
