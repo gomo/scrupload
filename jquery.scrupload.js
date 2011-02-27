@@ -7,7 +7,7 @@ if(g.scrupload )
 	
 var scr = g.scrupload = g.scrupload||{};
 
-scr.QUEUED = 1;
+scr.SELECTED = 1;
 scr.UPLOADING = 2;
 scr.FAILED = 3;
 scr.DONE = 4;
@@ -59,15 +59,17 @@ scr.generateElementId = function(element)
  * @returns
  */
 scr.buildDefaultPostParams = function(options){
-	var post = $.extend({}, options.post_params);
-	post.types = options.types;
+	
+	if(options.types)
+	{
+		options.post_params.types = options.types;
+	}
+	
 	
 	if(options.size_limit)
 	{
-		post.size_limit = options.size_limit;
+		options.post_params.size_limit = options.size_limit;
 	}
-
-	return post;
 };
 
 /**
@@ -92,9 +94,58 @@ scr.checkTypes = function(types, filename){
 
 scr.defaultOptions = function(options){
 	return $.extend({}, {
+		file_post_name: 'file',
 		post_params: {},
 		get_params: {}
 	}, options||{});
+};
+
+scr.checkElement = function(element){
+	if(element.length > 1)
+	{
+		throw 'More than one element in target.';
+	}
+};
+
+scr.initButtonEvent = function(widget, element){
+	var mouseover = false;
+	element.mouseout(function(){
+		if(mouseover)
+		{;
+		widget._trigger('onButtonOut', null, {
+				button: widget.element,
+				options: widget.options
+			});
+			mouseover = false;
+		}
+	}).mouseover(function(){
+		if(!mouseover)
+		{
+			widget._trigger('onButtonOver', null, {
+				button: widget.element,
+				options: self.options
+			});
+			mouseover = true;
+		}
+	}).mousedown(function(){
+		widget._trigger('onButtonDown', null, {
+			button: widget.element,
+			options: widget.options
+		});
+	});
+};
+
+scr.createFile = function(filename, options){
+	
+	return {
+		id : this.uniqid(),
+		time: new Date(),
+		filename: filename,
+		status: this.SELECTED,
+		user: {},
+		get: $.extend({}, options.get_params),
+		post: $.extend({}, options.post_params)
+	};
 };
 
 

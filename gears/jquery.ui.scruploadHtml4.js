@@ -11,12 +11,16 @@ $.widget('ui.scruploadHtml4', {
 		scrupload.checkElement(self.button);
 		
 		self.queue_array = [];
-		self.post = scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultPostParams(self.options);
 		
 		//chromeが画像のサイズを取得できなかった。
 		$(window).bind('load', function() {
 			self._initInterface();
-			self._trigger('onInit', null, {button: self.element});
+			self._trigger('onInit', null, {
+				button: self.element,
+				gear: 'html4',
+				options: self.options
+			});
 		});
 	},
 	_initInterface: function()
@@ -79,7 +83,7 @@ $.widget('ui.scruploadHtml4', {
 		//ここをappendToにするとfirefoxで（cssの組み方次第ですが）ボタンが少しずれます。
 		self.form.prependTo(document.body);
 		
-		var input = $('<input type="file" name="file" />');
+		var input = $('<input type="file" name="'+self.options.file_post_name+'" />');
 		self.form.append(input);
 		
 		input.change(function(){
@@ -96,14 +100,7 @@ $.widget('ui.scruploadHtml4', {
 				}	
 			}
 			
-			var file = {
-				id : scrupload.uniqid(),
-				time: new Date(),
-				filename: filename,
-				status: scrupload.SELECTED,
-				get: $.extend({}, self.options.get_params),
-				post: $.extend({}, self.post)
-			};
+			var file = scrupload.createFile(filename, self.options);
 			
 			//file typeのチェック
 			if(self.options.types && filename != 'n/a')
@@ -156,6 +153,13 @@ $.widget('ui.scruploadHtml4', {
 				var url = self.form.attr("action");
 				url = scrupload.buildUrlQuery(url, file.get);
 				self.form.attr('action', url);
+				
+				file.status = scrupload.UPLOADING;
+				self._trigger('onProgress', null, {
+					button: self.element,
+					file: file,
+					progress: {percent: 0}
+				});
 			});
 			
 			//upload
@@ -185,6 +189,7 @@ $.widget('ui.scruploadHtml4', {
 						//html4は一個しかアップロードできないので同義
 						self._trigger('onComplete', null, {
 							button: self.element,
+							uploaded: [file],
 							files: self.queue_array
 						});
 					}
@@ -196,12 +201,6 @@ $.widget('ui.scruploadHtml4', {
 				});
 			
 			self.form.submit();
-			file.status = scrupload.UPLOADING;
-			self._trigger('onProgress', null, {
-				button: self.element,
-				file: file,
-				progress: {percent: 0}
-			});
 		});
 		
 		return self.form;
@@ -216,8 +215,8 @@ $.widget('ui.scruploadHtml4', {
 		this.form.remove();
 		this.button.show();
 		this.queue_array = [];
-		this.self.post = {};
-		self.button = undefined;
+		this.button = undefined;
+		
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;
 	}
