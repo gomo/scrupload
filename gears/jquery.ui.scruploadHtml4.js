@@ -8,10 +8,7 @@ $.widget('ui.scruploadHtml4', {
 		var self = this;
 		
 		self.button = self.element.children();
-		if(self.button.length < 1)
-		{
-			throw 'More than one element in target.';
-		}
+		scrupload.checkElement(self.button);
 		
 		self.queue_array = [];
 		self.post = scrupload.buildDefaultPostParams(self.options);
@@ -65,18 +62,22 @@ $.widget('ui.scruploadHtml4', {
 		var default_os = input.offset();
 		var offset_top = input.height() / 2;
 		var offset_left = (input.width() / 4) * 3;
+		
 		form.mousemove(function(event){
 			input.offset({top: event.clientY - offset_top, left: event.clientX - offset_left});
 		}).mouseout(function(){
 			input.offset(default_os);
 		});
+		
+		scrupload.initButtonEvent(self, form);
 	},
 	_createFormAndInput: function()
 	{
 		var self = this;
 		
 		self.form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />');
-		self.form.appendTo(self.element);
+		//ここをappendToにするとfirefoxで（cssの組み方次第ですが）ボタンが少しずれます。
+		self.form.prependTo(document.body);
 		
 		var input = $('<input type="file" name="file" />');
 		self.form.append(input);
@@ -105,7 +106,7 @@ $.widget('ui.scruploadHtml4', {
 			};
 			
 			//file typeのチェック
-			if(filename != 'n/a')
+			if(self.options.types && filename != 'n/a')
 			{
 				if(!scrupload.checkTypes(self.options.types, filename))
 				{
@@ -212,10 +213,11 @@ $.widget('ui.scruploadHtml4', {
 	},
 	destroy: function()
 	{
-		this._form.remove();
-		this._button.show();
+		this.form.remove();
+		this.button.show();
 		this.queue_array = [];
 		this.self.post = {};
+		self.button = undefined;
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;
 	}
