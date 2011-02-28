@@ -8,8 +8,8 @@
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.scrupload.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/gears/jquery.ui.scruploadHtml4.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/gears/jquery.ui.scruploadSwfupload.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/runtimes/jquery.ui.scruploadHtml4.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/runtimes/jquery.ui.scruploadSwfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.js"></script>
 	<script type="text/javascript">
 		$(function(){
