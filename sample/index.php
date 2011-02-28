@@ -69,6 +69,9 @@
 				mutiple_select: true,
 				queue_limit: 3,
 				swfupload: {
+					button_image_url: '/img/upload.gif',
+					button_width: 148,
+					button_height: 60,
 					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
 				},
 				onInit: function(event, ui)
@@ -182,14 +185,14 @@
 
 <div>
 <h1>html4</h1>
-<div id="button_html4"><img src="/img/upload.gif" /></div>
+<div id="button_html4"></div>
 <a href="javascript:void(0)" onclick="$('#button_html4').scruploadHtml4('destroy')">destroy</a>
 <div class="display"></div>
 </div>
 
 <div>
 <h1>SWFUpload</h1>
-<div id="button_swfuplod"><img src="/img/upload.gif" /></div>
+<div id="button_swfuplod"></div>
 <a href="javascript:void(0)" onclick="$('#button_swfuplod').scruploadSwfupload('destroy')">destroy</a>
 <div class="display"></div>
 </div>
