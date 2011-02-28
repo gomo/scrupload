@@ -100,13 +100,6 @@ scr.defaultOptions = function(options){
 	}, options||{});
 };
 
-scr.checkElement = function(element){
-	if(element.length > 1)
-	{
-		throw 'More than one element in target.';
-	}
-};
-
 scr.initButtonEvent = function(widget, element){
 	var mouseover = false;
 	element.mouseout(function(){

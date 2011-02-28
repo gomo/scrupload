@@ -1,29 +1,24 @@
 (function($){
 $.widget('ui.scruploadSwfupload', {
 	options: scrupload.defaultOptions({
-		swfupload: {},
+		swfupload: {
+			prevent_swf_caching : false
+		},
 		mutiple_select: true
 	}),
 	_create: function()
 	{
 		var self = this;
-		//self.button = self.element.children();
-		//scrupload.checkElement(self.button);
 		
 		self.queue_array = [];
 		scrupload.buildDefaultPostParams(self.options);
 		
-		//chromeが画像のサイズを取得できなかった。
-		$(window).bind('load', function() {
-			self._initInterface();
-		});
+		self._initInterface();
 	},
 	_initInterface: function()
 	{
 		var self = this;
 		
-		//ここをappendToにするとfirefoxで（cssの組み方次第ですが）ボタンが少しずれます。
-		//self.swf_container = $("<div><div></div></div>").prependTo(document.body);
 		self.swf_container = $("<div><div></div></div>").appendTo(self.element);
 		self.swf_container.width(self.options.swfupload.button_width);
 		self.swf_container.height(self.options.swfupload.button_height);
@@ -126,33 +121,15 @@ $.widget('ui.scruploadSwfupload', {
 			setting.button_action = SWFUpload.BUTTON_ACTION.SELECT_FILE;
 		}
 		
-		/*self.swf_container
-			.css("position", 'absolute')
-			.height(self.button.height())
-			.width(self.button.width())
-			.offset(self.element.offset())
-			//.css('background-color', "#FF0000")
-		;
-		
-		$(window).resize(function(){self.replace();});*/
-		
 		scrupload.initButtonEvent(self, self.swf_container);
 		
 		self.swfuploader = new SWFUpload(setting);
 	},
-	/*replace: function()
-	{
-		if(this.swf_container)
-		{
-			this.swf_container.offset(this.element.offset());
-		}
-	},*/
 	destroy: function()
 	{
 		
 		this.swfuploader.destroy();
 		this.swf_container.remove();
-		//this.button = undefined;
 		this.queue_array = [];
 		
 		$.Widget.prototype.destroy.apply(this, arguments);
