@@ -69,7 +69,7 @@
 				mutiple_select: true,
 				queue_limit: 3,
 				swfupload: {
-					button_image_url: '/img/upload.gif',
+					button_image_url: '/img/upload_splite.gif',
 					button_width: 148,
 					button_height: 60,
 					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
