@@ -117,10 +117,11 @@
 		//Utility
 		function display(elem, title, obj)
 		{
-			var disp = elem.parent().find('.display');
+			console.info(title, obj);
+			/*var disp = elem.parent().find('.display');
 			disp.append("<h2>"+title+"</h2>"+_toHtmlString(obj));
 			$("#button_html4").scruploadHtml4('replace');
-			$("#button_swfuplod").scruploadSwfupload('replace');
+			$("#button_swfuplod").scruploadSwfupload('replace');*/
 		}
 
 		function _toHtmlString(obj)
@@ -172,13 +173,7 @@
 		}
 
 	</script>
-	<style type="text/css">
-		a.upload{
-			display: block;
-			width: 148px;
-			height: 60px;
-		}
-	</style>
+
 </head>
 <body>
 <p>Scrupload demo.</p>
