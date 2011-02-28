@@ -7,11 +7,11 @@ $.widget('ui.scruploadSwfupload', {
 	_create: function()
 	{
 		var self = this;
-		self.button = self.element.children();
-		scrupload.checkElement(self.button);
-		scrupload.buildDefaultPostParams(self.options);
+		//self.button = self.element.children();
+		//scrupload.checkElement(self.button);
 		
 		self.queue_array = [];
+		scrupload.buildDefaultPostParams(self.options);
 		
 		//chromeが画像のサイズを取得できなかった。
 		$(window).bind('load', function() {
@@ -23,17 +23,17 @@ $.widget('ui.scruploadSwfupload', {
 		var self = this;
 		
 		//ここをappendToにするとfirefoxで（cssの組み方次第ですが）ボタンが少しずれます。
-		self.swf_container = $("<div><div></div></div>").prependTo(document.body);
-		
+		//self.swf_container = $("<div><div></div></div>").prependTo(document.body);
+		self.swf_container = $("<div><div></div></div>").appendTo(self.element);
+		self.swf_container.width(self.options.swfupload.button_width);
+		self.swf_container.height(self.options.swfupload.button_height);
 		var files = {};
 		var uploaded = [];
 		var setting = $.extend(self.options.swfupload, {
 			file_post_name: self.options.file_post_name,
 			upload_url: self.options.url,
 			file_size_limit: self.options.size_limit,
-			button_placeholder_id: scrupload.generateElementId(self.swf_container.find('div')),
-			button_height: self.button.height(),
-			button_width: self.button.width(),
+			button_placeholder_id: scrupload.generateElementId(self.swf_container.find("div")),
 			preserve_relative_urls: true,
 			button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
 			swfupload_loaded_handler: function(){
@@ -126,7 +126,7 @@ $.widget('ui.scruploadSwfupload', {
 			setting.button_action = SWFUpload.BUTTON_ACTION.SELECT_FILE;
 		}
 		
-		self.swf_container
+		/*self.swf_container
 			.css("position", 'absolute')
 			.height(self.button.height())
 			.width(self.button.width())
@@ -134,25 +134,25 @@ $.widget('ui.scruploadSwfupload', {
 			//.css('background-color', "#FF0000")
 		;
 		
-		$(window).resize(function(){self.replace();});
+		$(window).resize(function(){self.replace();});*/
 		
 		scrupload.initButtonEvent(self, self.swf_container);
 		
 		self.swfuploader = new SWFUpload(setting);
 	},
-	replace: function()
+	/*replace: function()
 	{
 		if(this.swf_container)
 		{
 			this.swf_container.offset(this.element.offset());
 		}
-	},
+	},*/
 	destroy: function()
 	{
 		
 		this.swfuploader.destroy();
 		this.swf_container.remove();
-		this.button = undefined;
+		//this.button = undefined;
 		this.queue_array = [];
 		
 		$.Widget.prototype.destroy.apply(this, arguments);

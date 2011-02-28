@@ -1,14 +1,14 @@
 (function($){
 $.widget('ui.scruploadHtml4', {
 	options: scrupload.defaultOptions({
-		html4_use_input: false
+		//html4_use_input: false
 	}),
 	_create: function()
 	{
 		var self = this;
 		
-		self.button = self.element.children();
-		scrupload.checkElement(self.button);
+		//self.button = self.element.children();
+		//scrupload.checkElement(self.button);
 		
 		self.queue_array = [];
 		scrupload.buildDefaultPostParams(self.options);
@@ -26,18 +26,23 @@ $.widget('ui.scruploadHtml4', {
 	_initInterface: function()
 	{
 		var self = this;
-		if(self.options.html4_use_input)
+		if(true/*self.options.html4_use_input*/)
 		{
 			var form = self._createFormAndInput();
-			form.appendTo(self.element);
-			self.button.hide();
+			var span = $("<span />");
+			form.find("input[type=file]").appendTo(span.appendTo(self.element));
+			scrupload.initButtonEvent(self, span);
+			//self.button.hide();
 		}
-		else
+		/*else
 		{
+			//html4はブラウザ間の挙動の問題&アフォーダンスの問題で画像やHTMLで
+			//を起動ボタンにできないようにしました。
 			self._initFormForButton(self.button);
-		}
+			scrupload.initButtonEvent(self, self.form);
+		}*/
 	},
-	_initFormForButton: function(button)
+	/*_initFormForButton: function(button)
 	{
 		var self = this;
 		var form = self._createFormAndInput()
@@ -73,7 +78,7 @@ $.widget('ui.scruploadHtml4', {
 		});
 		
 		$(window).resize(function(){self.replace();});
-	},
+	},*/
 	_createFormAndInput: function()
 	{
 		var self = this;
@@ -86,6 +91,8 @@ $.widget('ui.scruploadHtml4', {
 		self.form.append(input);
 		
 		input.change(function(){
+			
+			$(this).appendTo(self.form);
 			
 			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
 			var filename = 'n/a';
@@ -202,17 +209,15 @@ $.widget('ui.scruploadHtml4', {
 			self.form.submit();
 		});
 		
-		scrupload.initButtonEvent(self, self.form);
-		
 		return self.form;
 	},
-	replace: function()
+	/*replace: function()
 	{
 		if(this.form)
 		{
 			this.form.offset(this.element.offset());
 		}
-	},
+	},*/
 	_resetInterface:function()
 	{
 		this.form.remove();
@@ -221,7 +226,7 @@ $.widget('ui.scruploadHtml4', {
 	destroy: function()
 	{
 		this.form.remove();
-		this.button.show();
+		//this.button.show();
 		this.queue_array = [];
 		this.button = undefined;
 		
