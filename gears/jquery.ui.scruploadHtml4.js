@@ -13,7 +13,7 @@ $.widget('ui.scruploadHtml4', {
 		self._initInterface();
 		self._trigger('onInit', null, {
 			element: self.element,
-			gear: 'html4',
+			runtime: 'html4',
 			options: self.options
 		});
 	},

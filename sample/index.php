@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.scrupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/gears/jquery.ui.scruploadHtml4.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/gears/jquery.ui.scruploadSwfupload.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.js"></script>
 	<script type="text/javascript">
 		$(function(){
 			$("#button_html4").scruploadHtml4({
@@ -111,9 +112,85 @@
 					display(ui.element, 'error', ui);
 				}
 			});
+
+
+
+
+
+
+
+			$("#button_auto").scrupload({
+				runtimes: 'html4|swfupload',
+				url: '/scrupload/upload.php',
+				post_params: {hoge: 123},
+				get_params:{huga: 456},
+				size_limit: "8MB",
+				types: "jpg|gif|png|bmp",
+				mutiple_select: true,
+				queue_limit: 3,
+				swfupload: {
+					button_image_url: '/img/upload_splite.gif',
+					button_width: 148,
+					button_height: 60,
+					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
+				},
+				onInit: function(event, ui)
+				{
+					display(ui.element, 'init', ui);
+				},
+				onSelect: function(event, ui)
+				{
+					display(ui.element, 'select', ui);
+				},
+				onProgress: function(event, ui)
+				{
+					display(ui.element, 'progress', ui);
+				},
+				onFileComplete: function(event, ui)
+				{
+					display(ui.element, 'file complete', ui);
+				},
+				onButtonOver: function(event, ui)
+				{
+					display(ui.element, 'button over', ui);
+				},
+				onButtonDown: function(event, ui)
+				{
+					display(ui.element, 'button down', ui);
+				},
+				onButtonOut: function(event, ui)
+				{
+					display(ui.element, 'button out', ui);
+				},
+				onComplete: function(event, ui)
+				{
+					display(ui.element, 'complete', ui);
+				},
+				onError: function(event, ui)
+				{
+					display(ui.element, 'error', ui);
+				}
+			});
+
+
+
+
+
+
+			
 			
 		});
 
+
+
+		
+
+
+
+
+
+
+		//////////////////////////////////////////////
 		//Utility
 		function display(elem, title, obj)
 		{
@@ -189,6 +266,13 @@
 <h1>SWFUpload</h1>
 <div id="button_swfuplod"></div>
 <a href="javascript:void(0)" onclick="$('#button_swfuplod').scruploadSwfupload('destroy')">destroy</a>
+<div class="display"></div>
+</div>
+
+<div>
+<h1>Auto</h1>
+<div id="button_auto"></div>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('destroy')">destroy</a>
 <div class="display"></div>
 </div>
 

@@ -34,7 +34,7 @@ $.widget('ui.scruploadSwfupload', {
 			swfupload_loaded_handler: function(){
 				self._trigger('onInit', null, {
 					element: self.element,
-					gear: 'swfupload',
+					runtime: 'swfupload',
 					options: self.options
 				});
 			},
