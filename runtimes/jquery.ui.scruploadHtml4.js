@@ -26,7 +26,7 @@ $.widget('ui.scruploadHtml4', {
 	{
 		var self = this;
 		
-		self.input = $('<input type="file" name="'+self.options.file_post_name+'" />');
+		self.input = $('<input type="file" />');
 		self.container = $("<span />");
 		self.input.appendTo(self.container.appendTo(self.element));
 		scrupload.initButtonEvent(self, self.container);
@@ -36,13 +36,15 @@ $.widget('ui.scruploadHtml4', {
 			var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
 				filename = 'n/a',
 				result,
-				file
+				file,
+				input = $(this)
 				;
 			
+			input.attr('name', self.options.file_post_name);
 			
 			form
-				.appendTo(document.body)
-				.append($(this));
+				.appendTo(self.element)
+				.append(input);
 			
 			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
 			
