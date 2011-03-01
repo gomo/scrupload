@@ -5,6 +5,10 @@ $.widget('ui.scrupload', {
 	},
 	_create: function()
 	{
+		this.isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
+		this.isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
+		this.isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
+		
 		var self = this,
 			runtimes = {
 				swfupload : self.detectFlashVer(8, 0, 0) && window.SWFUpload,
@@ -13,6 +17,8 @@ $.widget('ui.scrupload', {
 			list = self.options.runtimes.split("|"),
 			target
 		;
+		
+		
 		
 		list.push("html4");
 		for(var i=0; i<list.length; i++)
@@ -34,10 +40,7 @@ $.widget('ui.scrupload', {
 	},
 	detectFlashVer: function(reqMajorVer, reqMinorVer, reqRevision)
 	{
-		var isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false,
-			isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false,
-			isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false,
-			versionStr = this._getFlashVesion(),
+		var	versionStr = this._getFlashVesion(),
 			versionMajor,
 			versionMinor,
 			versionRevision
@@ -50,7 +53,7 @@ $.widget('ui.scrupload', {
 		}
 		else if (versionStr != 0)
 		{
-			if(isIE && isWin && !isOpera)
+			if(this.isIE && this.isWin && !this.isOpera)
 			{
 				// Given "WIN 2,0,0,11"
 				tempArray         = versionStr.split(" "); 	// ["WIN", "2,0,0,11"]
@@ -134,7 +137,7 @@ $.widget('ui.scrupload', {
 		else if (navigator.userAgent.toLowerCase().indexOf("webtv/2.5") != -1) flashVer = 3;
 		// older WebTV supports Flash 2
 		else if (navigator.userAgent.toLowerCase().indexOf("webtv") != -1) flashVer = 2;
-		else if ( isIE && isWin && !isOpera )
+		else if ( this.isIE && this.isWin && !this.isOpera )
 		{
 			flashVer = this._getFlashVersionForIE();
 		}	
