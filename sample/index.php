@@ -7,10 +7,7 @@
 	<script type="text/javascript" src="/js/sdx/lib/jquery-ui-1.8.7.custom.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.scrupload.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/runtimes/jquery.ui.scruploadHtml4.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/runtimes/jquery.ui.scruploadSwfupload.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.min.js"></script>
 	<script type="text/javascript">
 		$(function(){
 			$("#button_html4").scruploadHtml4({
@@ -120,7 +117,7 @@
 
 
 			$("#button_auto").scrupload({
-				runtimes: 'html4|swfupload',
+				runtimes: 'swfupload|html4',
 				url: '/scrupload/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},

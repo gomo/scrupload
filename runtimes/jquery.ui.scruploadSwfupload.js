@@ -5,8 +5,7 @@ $.widget('ui.scruploadSwfupload', {
 			prevent_swf_caching : false,
 			button_cursor : SWFUpload.CURSOR.HAND
 		},
-		mutiple_select: true,
-		runtime: 'swfupload'
+		mutiple_select: true
 	}),
 	_create: function()
 	{
@@ -19,14 +18,18 @@ $.widget('ui.scruploadSwfupload', {
 	},
 	_initInterface: function()
 	{
-		var self = this;
+		var self = this,
+			files = {},
+			uploaded = [],
+			setting
+		;
 		
 		self.swf_container = $("<div><div></div></div>").appendTo(self.element);
 		self.swf_container.width(self.options.swfupload.button_width);
 		self.swf_container.height(self.options.swfupload.button_height);
-		var files = {};
-		var uploaded = [];
-		var setting = $.extend(self.options.swfupload, {
+		
+		self.swfuploader = null;
+		setting = $.extend(self.options.swfupload, {
 			file_post_name: self.options.file_post_name,
 			upload_url: self.options.url,
 			file_size_limit: self.options.size_limit,
@@ -34,8 +37,10 @@ $.widget('ui.scruploadSwfupload', {
 			preserve_relative_urls: true,
 			button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
 			swfupload_loaded_handler: function(){
+				self.runtime = {name: "swfupload", object:self.swfuploader};
 				self._trigger('onInit', null, {
 					element: self.element,
+					runtime: self.runtime,
 					options: self.options
 				});
 			},
@@ -50,6 +55,7 @@ $.widget('ui.scruploadSwfupload', {
 						element: self.element,
 						file: file,
 						error: scrupload.ERROR_QUEUE_LIMIT,
+						runtime: self.runtime,
 						options: self.options
 					});
 					
@@ -63,7 +69,9 @@ $.widget('ui.scruploadSwfupload', {
 					
 					self._trigger('onSelect', null, {
 						element: self.element,
-						file: file
+						runtime: self.runtime,
+						file: file,
+						options: self.options
 					});
 				}
 			},
@@ -71,28 +79,34 @@ $.widget('ui.scruploadSwfupload', {
 				this.startUpload();
 			},
 			upload_start_handler: function(swf_file){
-				var file = files[swf_file.id];
+				var file = files[swf_file.id],
+					url
+				;
 				
 				//post
 				file.post.id = file.id;
 				this.setPostParams(file.post);
 				
 				//get
-				var url = scrupload.buildUrlQuery(self.options.url, file.get);
+				url = scrupload.buildUrlQuery(self.options.url, file.get);
 				this.setUploadURL(url);
 			},
 			upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
-				var file = files[swf_file.id];
+				var file = files[swf_file.id],
+					percent = Math.ceil((bytes_loaded / bytes_total) * 100)
+					;
+					
 				file.status = scrupload.UPLOADING;
 				
-				var percent = Math.ceil((bytes_loaded / bytes_total) * 100);
 				self._trigger('onProgress', null, {
 					element: self.element,
+					runtime: self.runtime,
 					file: file,
 					progress: {
 						percent: percent,
 						bytes_loaded: bytes_loaded,
-						bytes_total: bytes_total
+						bytes_total: bytes_total,
+						options: self.options
 					}
 				});
 			},
@@ -101,15 +115,19 @@ $.widget('ui.scruploadSwfupload', {
 				file.status = scrupload.DONE;
 				self._trigger('onFileComplete', null, {
 					element: self.element,
+					runtime: self.runtime,
 					file: file,
-					response: resp
+					response: resp,
+					options: self.options
 				});
 			},
 			queue_complete_handler: function(num_uploaded){
 				self._trigger('onComplete', null, {
 					element: self.element,
+					runtime: self.runtime,
 					uploaded: uploaded,
-					files: self.queue_array
+					files: self.queue_array,
+					options: self.options
 				});
 				
 				uploaded = [];

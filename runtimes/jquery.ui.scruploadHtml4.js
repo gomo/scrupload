@@ -1,7 +1,6 @@
 (function($){
 $.widget('ui.scruploadHtml4', {
 	options: scrupload.defaultOptions({
-		runtime: 'html4'
 	}),
 	_create: function()
 	{
@@ -11,8 +10,10 @@ $.widget('ui.scruploadHtml4', {
 		scrupload.buildDefaultPostParams(self.options);
 		
 		self._initInterface();
+		self.runtime = {name: 'html4', object: self.input};
 		self._trigger('onInit', null, {
 			element: self.element,
+			runtime: self.runtime,
 			options: self.options
 		});
 	},
@@ -25,31 +26,37 @@ $.widget('ui.scruploadHtml4', {
 	{
 		var self = this;
 		
-		var input = $('<input type="file" name="'+self.options.file_post_name+'" />');
+		self.input = $('<input type="file" name="'+self.options.file_post_name+'" />');
 		self.container = $("<span />");
-		input.appendTo(self.container.appendTo(self.element));
+		self.input.appendTo(self.container.appendTo(self.element));
 		scrupload.initButtonEvent(self, self.container);
 		
-		input.change(function(){
+		self.input.change(function(){
 			
-			var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />');
+			var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
+				filename = 'n/a',
+				result,
+				file
+				;
+			
+			
 			form
 				.appendTo(document.body)
 				.append($(this));
 			
 			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
-			var filename = 'n/a';
+			
 			if(this.value)
 			{
-				var filename = this.value;
-				var result = filename.match(/[\/\\]([^\/\\]+)$/i);
+				filename = this.value;
+				result = filename.match(/[\/\\]([^\/\\]+)$/i);
 				if (result)
 				{
 					filename = result[1];
 				}	
 			}
 			
-			var file = scrupload.createFile(filename, self.options);
+			file = scrupload.createFile(filename, self.options);
 			
 			//file typeのチェック
 			if(self.options.types && filename != 'n/a')
@@ -61,6 +68,7 @@ $.widget('ui.scruploadHtml4', {
 						element: self.element,
 						file: file,
 						error: scrupload.ERROR_TYPE,
+						runtime: self.runtime,
 						options: self.options
 					});
 					self._resetInterface();
@@ -77,6 +85,7 @@ $.widget('ui.scruploadHtml4', {
 					element: self.element,
 					file: file,
 					error: scrupload.ERROR_QUEUE_LIMIT,
+					runtime: self.runtime,
 					options: self.options
 				});
 				self._resetInterface();
@@ -88,7 +97,9 @@ $.widget('ui.scruploadHtml4', {
 			
 			self._trigger('onSelect', null, {
 				element: self.element,
-				file: file
+				runtime: self.runtime,
+				file: file,
+				options: self.options
 			});
 			
 			form.submit(function(){
@@ -106,8 +117,10 @@ $.widget('ui.scruploadHtml4', {
 				file.status = scrupload.UPLOADING;
 				self._trigger('onProgress', null, {
 					element: self.element,
+					runtime: self.runtime,
 					file: file,
-					progress: {percent: 0}
+					progress: {percent: 0},
+					options: self.options
 				});
 			});
 			
@@ -118,28 +131,36 @@ $.widget('ui.scruploadHtml4', {
 				.appendTo(document.body)
 				.css({width: '1px', height: '1px', position: 'absolute', left: '-10000px', top: '-10000px'})
 				.load(function(){
-					var iframe = $(this);
-					var resp = $(this.contentWindow.document.body).text();
+					var iframe = $(this),
+						resp = $(this.contentWindow.document.body).text()
+						;
+					
 					if (resp)
 					{
 						self._trigger('onProgress', null, {
 							element: self.element,
 							file: file,
-							progress: {percent: 100}
+							runtime: self.runtime,
+							progress: {percent: 100},
+							options: self.options
 						});
 						
 						file.status = scrupload.DONE;
 						self._trigger('onFileComplete', null, {
 							element: self.element,
 							file: file,
-							response: resp
+							runtime: self.runtime,
+							response: resp,
+							options: self.options
 						});
 						
 						//html4は一個しかアップロードできないので同義
 						self._trigger('onComplete', null, {
 							element: self.element,
 							uploaded: [file],
-							files: self.queue_array
+							runtime: self.runtime,
+							files: self.queue_array,
+							options: self.options
 						});
 					}
 					
@@ -158,15 +179,11 @@ $.widget('ui.scruploadHtml4', {
 		this.container.remove();
 		this._initInterface();
 	},
-	getRuntime: function()
-	{
-		return this.container.find('input[type=file]');
-	},
 	destroy: function()
 	{
 		this.container.remove();
 		this.queue_array = [];
-		this.button = undefined;
+		this.input = undefined;
 		
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;

@@ -18,12 +18,13 @@ scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function()
 {
-	var char = 'abcdefghijklmnopqrstuvwxyz';
-	var result = [];
-	var len = char.length;
+	var word = 'abcdefghijklmnopqrstuvwxyz',
+		result = [],
+		len = word.length;
+	
 	for (var i = 0; i < 8; ++i)
 	{
-		result.push(char.charAt(Math.floor(len*Math.random())));
+		result.push(word.charAt(Math.floor(len*Math.random())));
 	}
 	return result.join('') + new Date().getTime();
 };
@@ -104,9 +105,10 @@ scr.initButtonEvent = function(widget, element){
 	var mouseover = false;
 	element.mouseout(function(){
 		if(mouseover)
-		{;
-		widget._trigger('onButtonOut', null, {
+		{
+			widget._trigger('onButtonOut', null, {
 				element: widget.element,
+				runtime: widget.runtime,
 				options: widget.options
 			});
 			mouseover = false;
@@ -116,6 +118,7 @@ scr.initButtonEvent = function(widget, element){
 		{
 			widget._trigger('onButtonOver', null, {
 				element: widget.element,
+				runtime: widget.runtime,
 				options: widget.options
 			});
 			mouseover = true;
@@ -123,6 +126,7 @@ scr.initButtonEvent = function(widget, element){
 	}).mousedown(function(){
 		widget._trigger('onButtonDown', null, {
 			element: widget.element,
+			runtime: widget.runtime,
 			options: widget.options
 		});
 	});
