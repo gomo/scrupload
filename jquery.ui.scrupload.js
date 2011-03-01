@@ -20,6 +20,12 @@ $.widget('ui.scrupload', {
 			if(runtimes[list[i]])
 			{
 				target = "scrupload"+list[i][0].toUpperCase()+list[i].substr(1);
+				if(!self.element[target])
+				{
+					continue;
+				}
+				
+				//widget‹N“®
 				self.element[target](self.options);
 				break;
 			}

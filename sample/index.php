@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="/js/sdx/lib/jquery-ui-1.8.7.custom.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.min.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.js"></script>
 	<script type="text/javascript">
 		$(function(){
 			$("#button_html4").scruploadHtml4({
