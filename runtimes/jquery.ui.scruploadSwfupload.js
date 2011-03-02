@@ -49,7 +49,7 @@ if(window.SWFUpload)
 				file_queued_handler: function(swf_file){
 					var file = scrupload.createFile(swf_file.name, self.options);
 					
-					//queue_limitのチェック
+					//queue_limit縺ｮ繝√ぉ繝�繧ｯ
 					if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
 					{
 						file.status = scrupload.FAILED;
