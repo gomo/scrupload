@@ -46,7 +46,7 @@ $.widget('ui.scruploadHtml4', {
 				.appendTo(self.element)
 				.append(input);
 			
-			//�u���E�U�ɂ���ē�����l���ς��̂ŉ\�Ȃ�t�@�C�����݂̂ɂ���
+			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
 			
 			if(this.value)
 			{
@@ -60,7 +60,7 @@ $.widget('ui.scruploadHtml4', {
 			
 			file = scrupload.createFile(filename, self.options);
 			
-			//file type�̃`�F�b�N
+			//file typeのチェック
 			if(self.options.types && filename != 'n/a')
 			{
 				if(!scrupload.checkTypes(self.options.types, filename))
@@ -79,7 +79,7 @@ $.widget('ui.scruploadHtml4', {
 				}
 			}
 			
-			//queue_limit�̃`�F�b�N
+			//queue_limitのチェック
 			if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
 			{
 				file.status = scrupload.FAILED;
@@ -156,7 +156,7 @@ $.widget('ui.scruploadHtml4', {
 							options: self.options
 						});
 						
-						//html4�͈�����A�b�v���[�h�ł��Ȃ��̂œ��`
+						//html4は一個しかアップロードできないので同義
 						self._trigger('onComplete', null, {
 							element: self.element,
 							uploaded: [file],
