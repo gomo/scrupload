@@ -5,7 +5,9 @@ if(g.scrupload )
 	return;
 }
 	
-var scr = g.scrupload = g.scrupload||{};
+var scr = g.scrupload = g.scrupload||{},
+	uid_count = 0;
+;
 
 scr.SELECTED = 1;
 scr.UPLOADING = 2;
@@ -16,17 +18,16 @@ scr.ERROR_TYPE = 10;
 scr.ERROR_SIZE_LIMIT = 11;
 scr.ERROR_QUEUE_LIMIT = 12;
 
-scr.uniqid = function()
+scr.uniqid = function(prefix)
 {
-	var word = 'abcdefghijklmnopqrstuvwxyz',
-		result = [],
-		len = word.length;
-	
-	for (var i = 0; i < 8; ++i)
+	var uid = new Date().getTime().toString(32), i;
+
+	for (i = 0; i < 5; i++) 
 	{
-		result.push(word.charAt(Math.floor(len*Math.random())));
+		uid += Math.floor(Math.random() * 65535).toString(32);
 	}
-	return result.join('') + new Date().getTime();
+
+	return (prefix || 's') + uid + (uid_count++).toString(32);
 };
 
 scr.buildUrlQuery = function(url, params)
@@ -55,7 +56,7 @@ scr.generateElementId = function(element)
 };
 
 /**
- * options‚Ì’†‚Å‹­§“I‚Épost‚·‚é‚à‚Ì
+ * optionsã®ä¸­ã§å¼·åˆ¶çš„ã«postã™ã‚‹ã‚‚ã®
  * @param options
  * @returns
  */
@@ -74,15 +75,15 @@ scr.buildDefaultPostParams = function(options){
 };
 
 /**
- * Šg’£Žq‚ðƒ`ƒFƒbƒN‚·‚é
+ * æ‹¡å¼µå­ã‚’ãƒã‚§ãƒƒã‚¯ã™ã‚‹
  * @param types
  * @param filename
  * @returns {Boolean}
  */
 scr.checkTypes = function(types, filename){
 	
-	var list = types.split("|");
-	for(var i=0; i<list.length; i++)
+	var list = types.split("|"), i;
+	for(i=0; i<list.length; i++)
 	{
 		if(filename.toLowerCase().lastIndexOf(list[i].toLowerCase()) == filename.length - list[i].length)
 		{
@@ -135,7 +136,7 @@ scr.initButtonEvent = function(widget, element){
 scr.createFile = function(filename, options){
 	
 	return {
-		id : this.uniqid(),
+		id : this.uniqid(options.file_id_prefix),
 		time: new Date(),
 		filename: filename,
 		status: this.SELECTED,
