@@ -1,4 +1,5 @@
 (function($){
+
 $.widget('ui.scrupload', {
 	options: {
 		runtimes:'swfupload|html4'
@@ -15,23 +16,24 @@ $.widget('ui.scrupload', {
 				html4: true
 			},
 			list = self.options.runtimes.split("|"),
-			target
+			target,
+			i
 		;
 		
 		
 		
 		list.push("html4");
-		for(var i=0; i<list.length; i++)
+		for(i=0; i<list.length; i++)
 		{
 			if(runtimes[list[i]])
 			{
-				target = "scrupload"+list[i][0].toUpperCase()+list[i].substr(1);
+				target = "scrupload"+list[i].substr(0, 1).toUpperCase()+list[i].substr(1);
 				if(!self.element[target])
 				{
 					continue;
 				}
 				
-				//widget‹N“®
+				//widgetèµ·å‹•
 				self.element[target](self.options);
 				break;
 			}
