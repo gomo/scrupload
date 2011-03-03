@@ -12,16 +12,23 @@ $.widget('ui.scruploadThumbnail', {
 			{
 				var resp = $.parseJSON(ui.response),
 					img,
-					preview
-				;
+					preview;
 				
-				//ダイアログ準備
+				if(resp.error)
+				{
+					self._trigger('onError', null, {
+						element: self.element,
+						response: resp,
+						options: self.options
+					});
+					
+					return;
+				}
+				
+				//ダイアログdiv
 				self.dialog = $("<div />")
 					.appendTo(document.body)
-					.append(self.options.dialog_template.html())
-					.dialog($.extend(self.options.dialog, {
-						
-					}));
+					.append(self.options.dialog_template.html());
 				
 				//メイン画像
 				img = $('<img src="'+resp.path+'" />');
@@ -33,11 +40,19 @@ $.widget('ui.scruploadThumbnail', {
 					.append(preview)
 					.width(self.options.width)
 					.height(self.options.height)
-					.css('overflow', 'hidden');
+					.css('overflow', 'hidden');			
 				
-				self.dialog.find("*").disableSelection();
 				
 				img.bind('load', function(){
+					self.dialog.dialog($.extend(self.options.dialog, {
+						close:function(event, ui)
+						{
+							self.dialog.dialog('destroy');
+							self.dialog.remove();
+							self.dialog = null;
+						}
+					}));
+					
 					var size = {width: img.width(), height: img.height()},
 						disable_selection = false,
 						showPreview
@@ -66,6 +81,8 @@ $.widget('ui.scruploadThumbnail', {
 						});
 					};
 					
+					self.dialog.find("*").disableSelection();
+					
 					img.Jcrop({
 						onChange: showPreview,
 						onSelect: showPreview,
@@ -79,6 +96,12 @@ $.widget('ui.scruploadThumbnail', {
 	},
 	destroy: function()
 	{
+		if(this.dialog)
+		{
+			this.dialog.dialog('destroy');
+			this.dialog.remove();
+		}
+		
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;
 	}
