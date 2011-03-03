@@ -51,6 +51,9 @@ $.widget('ui.scruploadThumbnail', {
 						.css('overflow', 'hidden')
 						.append(preview);
 					
+					tmp_div.remove();
+					delete tmp_div;
+					
 					self.dialog.dialog($.extend(self.options.dialog, {
 						close:function(event, ui)
 						{
@@ -63,16 +66,6 @@ $.widget('ui.scruploadThumbnail', {
 					self.dialog.find("*").disableSelection();
 					self._initJcrop(img, preview);
 				});
-				
-				/*img.bind('load', function(){
-					
-					
-					
-					
-					
-					
-
-				});*/
 			}
 		}));
 	},
