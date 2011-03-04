@@ -1,0 +1,15 @@
+@CHARSET "UTF-8";
+
+.scr_thumb_image{
+	float: left;	
+}
+
+.scr_thumb_preview{
+	float: right;
+	border: 1px dotted #AAAAAA;	
+}
+
+.scr_thumb_action{
+	padding: 20px 0px;
+	text-align: center;
+}
