@@ -18,9 +18,10 @@ $.widget('ui.scropThumb', {
 					tmp_div,
 					event_return;
 				
+				//responseにerrorがあったら終了
 				if(resp.error)
 				{
-					self._trigger('onError', null, {
+					self._trigger('onUploadError', null, {
 						element: self.element,
 						response: resp,
 						options: self.options
@@ -35,6 +36,7 @@ $.widget('ui.scropThumb', {
 					options: self.options
 				});
 				
+				//onLoadImageがfalseを返したら終了
 				if(event_return === false)
 				{
 					return;
@@ -42,6 +44,7 @@ $.widget('ui.scropThumb', {
 				
 				self.image_path = resp[self.options.path_key_name];
 				
+				//サイズを取るためにappendした画像が画面に出ないように
 				var tmp_div = $('<div />')
 					.appendTo(document.body)
 					.css('position', 'absolute')
@@ -64,7 +67,8 @@ $.widget('ui.scropThumb', {
 					self.dialog.find(".scr_thumb_image")
 						.append(img)
 						.width(size.width)
-						.height(size.height);
+						.height(size.height)
+						;
 					
 					self.dialog.find(".scr_thumb_preview")
 						.width(self.options.width)
@@ -83,6 +87,7 @@ $.widget('ui.scropThumb', {
 						}
 					}));
 					
+					//決定ボタンのイベント
 					self.dialog.find(".sdx_thumb_button").click(function(){
 						$.ajax({
 							type: "POST",
@@ -102,7 +107,13 @@ $.widget('ui.scropThumb', {
 							},
 							error: function(XMLHttpRequest, textStatus, errorThrown)
 							{
-								alert('Ajax error: '+textStatus);
+								self._trigger('onCropError', null, {
+									element: self.element,
+									xml_http_request: XMLHttpRequest,
+									text_status: textStatus,
+									error_thrown: errorThrown,
+									options: self.options
+								});
 								
 								if(window['console'])
 								{
