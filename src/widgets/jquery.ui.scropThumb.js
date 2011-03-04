@@ -2,7 +2,7 @@
 $.widget('ui.scropThumb', {
 	options: {
 		scrupload: {},
-		additional_width: 40,
+		additional_width: 50,
 		path_key_name: 'path'
 	},
 	_create: function()
@@ -16,7 +16,8 @@ $.widget('ui.scropThumb', {
 					img,
 					preview,
 					tmp_div,
-					event_return;
+					event_return
+					;
 				
 				//responseにerrorがあったら終了
 				if(resp.error)
@@ -57,7 +58,8 @@ $.widget('ui.scropThumb', {
 				preview = $('<img src="'+self.image_path+'" />').appendTo(tmp_div);
 				
 				img.load(function(){
-					var size = {width: img.width(), height: img.height()};
+					var size = {width: img.width(), height: img.height()}
+						;
 					
 					//ダイアログdiv
 					self.dialog = $("<div />")
@@ -119,6 +121,8 @@ $.widget('ui.scropThumb', {
 								{
 									console.info('Ajax error', XMLHttpRequest);
 								}
+								
+								self._closeDialog();
 							}
 						});
 						return false;
