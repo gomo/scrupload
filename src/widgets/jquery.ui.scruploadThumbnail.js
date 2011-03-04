@@ -1,7 +1,8 @@
 (function($){
 $.widget('ui.scruploadThumbnail', {
 	options: {
-		scrupload: {}
+		scrupload: {},
+		additional_width: 40
 	},
 	_create: function()
 	{
@@ -38,12 +39,17 @@ $.widget('ui.scruploadThumbnail', {
 				preview = $('<img src="'+resp.path+'" />').appendTo(tmp_div);
 				
 				img.load(function(){
+					var size = {width: img.width(), height: img.height()};
+					
 					//ダイアログdiv
 					self.dialog = $("<div />")
 						.appendTo(document.body)
 						.append(self.options.dialog_template.html());
 					
-					self.dialog.find(".scr_thumb_image").append(img);
+					self.dialog.find(".scr_thumb_image")
+						.append(img)
+						.width(size.width)
+						.height(size.height);
 					
 					self.dialog.find(".scr_thumb_preview")
 						.width(self.options.width)
@@ -55,6 +61,7 @@ $.widget('ui.scruploadThumbnail', {
 					delete tmp_div;
 					
 					self.dialog.dialog($.extend(self.options.dialog, {
+						width: size.width + self.options.width + self.options.additional_width,
 						close:function(event, ui)
 						{
 							self.dialog.dialog('destroy');
@@ -64,15 +71,14 @@ $.widget('ui.scruploadThumbnail', {
 					}));
 					
 					self.dialog.find("*").disableSelection();
-					self._initJcrop(img, preview);
+					self._initJcrop(img, preview, size);
 				});
 			}
 		}));
 	},
-	_initJcrop: function(img, preview)
+	_initJcrop: function(img, preview, size)
 	{
-		var size = {width: img.width(), height: img.height()},
-			disable_selection = false,
+		var disable_selection = false,
 			showPreview,
 			self = this
 		;
