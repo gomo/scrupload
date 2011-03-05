@@ -10,6 +10,14 @@ $.widget('ui.scropThumb', {
 		var self = this;
 		
 		self.element.scrupload($.extend(self.options.scrupload, {
+			onSelect: function(event, ui)
+			{
+				self._trigger('onImageSelect', null, {
+					element: self.element,
+					scrupload: ui,
+					options: self.options
+				});
+			},
 			onFileComplete: function(event, ui)
 			{
 				var resp = $.parseJSON(ui.response),
