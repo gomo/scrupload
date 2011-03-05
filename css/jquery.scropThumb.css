@@ -1,5 +1,17 @@
 @CHARSET "UTF-8";
 
+.scr_html4_container{
+	padding-left: 18px;
+	background-repeat: no-repeat;
+	background-position: 0px 3px;
+	background-image: url("img/upload.png");
+}
+
+.scr_html4_container.scr_uploading{
+	background-image: url("img/uploading.gif");
+	
+}
+
 .scr_thumb_image{
 	float: left;
 }

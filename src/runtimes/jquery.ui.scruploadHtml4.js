@@ -6,6 +6,8 @@ $.widget('ui.scruploadHtml4', {
 	{
 		var self = this;
 		
+		self.element.addClass("scr_html4_container");
+		
 		self.queue_array = [];
 		scrupload.buildDefaultPostParams(self.options);
 		
@@ -39,6 +41,8 @@ $.widget('ui.scruploadHtml4', {
 				file,
 				input = $(this)
 				;
+			
+			self.element.addClass("scr_uploading");
 			
 			input.attr('name', self.options.file_post_name);
 			
@@ -170,6 +174,7 @@ $.widget('ui.scruploadHtml4', {
 						iframe.remove();
 						form.remove();
 						self._resetInterface();
+						self.element.removeClass("scr_uploading");
 					}, 0);
 				});
 			
@@ -183,6 +188,7 @@ $.widget('ui.scruploadHtml4', {
 	},
 	destroy: function()
 	{
+		this.element.removeClass("scr_html4_container");
 		this.container.remove();
 		this.queue_array = [];
 		this.input = undefined;
