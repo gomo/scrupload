@@ -108,7 +108,7 @@ $.widget('ui.scropThumb', {
 								size: {w: self.options.width, h: self.options.height}
 							},
 							success: function(data){
-								self._trigger('onSubmit', null, {
+								self._trigger('onCropSuccess', null, {
 									dialog: self.dialog,
 									response: data
 								});
