@@ -144,6 +144,7 @@ $.widget('ui.scropThumb', {
 	},
 	_closeDialog: function()
 	{
+		this.dialog.dialog("close");
 		this.dialog.dialog('destroy');
 		this.dialog.remove();
 		this.dialog = null;
