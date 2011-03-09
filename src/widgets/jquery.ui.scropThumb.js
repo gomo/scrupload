@@ -3,7 +3,8 @@ $.widget('ui.scropThumb', {
 	options: {
 		scrupload: {},
 		additional_width: 50,
-		path_key_name: 'path'
+		path_key_name: 'path',
+		default_select_max: true
 	},
 	_create: function()
 	{
@@ -94,6 +95,10 @@ $.widget('ui.scropThumb', {
 						close:function(event, ui)
 						{
 							self._closeDialog();
+						},
+						open: function(event, ui)
+						{
+							self._initJcrop(img, preview, size);
 						}
 					}));
 					
@@ -137,7 +142,6 @@ $.widget('ui.scropThumb', {
 					});
 					
 					self.dialog.find("*").disableSelection();
-					self._initJcrop(img, preview, size);
 				});
 			}
 		}));
@@ -183,13 +187,19 @@ $.widget('ui.scropThumb', {
 			});
 		};
 		
-		img.Jcrop({
-			onChange: showPreview,
-			onSelect: showPreview,
-			aspectRatio: self.options.width / self.options.height,
-			minSize: [self.options.width, self.options.height],
-			setSelect: [0, 0, self.options.width, self.options.height]
-		});
+		var select = self.options.default_select_max
+			? [0, 0, size.width, null]
+			: [0, 0, self.options.width, self.options.height];
+		
+		setTimeout(function(){
+			img.Jcrop({
+				onChange: showPreview,
+				onSelect: showPreview,
+				aspectRatio: self.options.width / self.options.height,
+				minSize: [self.options.width, self.options.height],
+				setSelect: select
+			});
+		}, 100);
 	},
 	destroy: function()
 	{
