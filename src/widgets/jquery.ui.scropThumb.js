@@ -4,7 +4,8 @@ $.widget('ui.scropThumb', {
 		scrupload: {},
 		additional_width: 50,
 		path_key_name: 'path',
-		default_select_max: true
+		default_select_max: true,
+		data_type: 'json'
 	},
 	_create: function()
 	{
@@ -107,6 +108,7 @@ $.widget('ui.scropThumb', {
 						$.ajax({
 							type: "POST",
 							url: self.options.url,
+							dataType: self.options.data_type,
 							data: {
 								path: self.image_path,
 								coords: self.coords,
