@@ -13,6 +13,7 @@ $.widget('ui.scrupload', {
 		var self = this,
 			runtimes = {
 				swfupload : self.detectFlashVer(8, 0, 0) && window.SWFUpload,
+				http: true,
 				html4: true
 			},
 			list = self.options.runtimes.split("|"),
