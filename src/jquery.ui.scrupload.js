@@ -2,7 +2,7 @@
 
 $.widget('ui.scrupload', {
 	options: {
-		runtimes:'swfupload|html4'
+		runtimes:'swfupload|http|html4'
 	},
 	_create: function()
 	{
@@ -25,20 +25,32 @@ $.widget('ui.scrupload', {
 		list.push("html4");
 		for(i=0; i<list.length; i++)
 		{
-			if(runtimes[list[i]])
+			if(runtimes[list[i]] && self.start(list[i]))
 			{
-				target = "scrupload"+list[i].substr(0, 1).toUpperCase()+list[i].substr(1);
-				if(!self.element[target])
-				{
-					continue;
-				}
-				
-				//widget起動
-				self.element[target](self.options);
 				break;
 			}
 		}
+	},
+	start: function(runtime)
+	{
+		var target = this._getRuntimeName(runtime);
+		if(this.current_runtime != runtime && this.element[target])
+		{
+			if(this.current_runtime)
+			{
+				this.element[this._getRuntimeName(this.current_runtime)]("destroy");
+			}
+			
+			this.element[target](this.options);
+			this.current_runtime = runtime;
+			return true;
+		}
 		
+		return false;
+	},
+	_getRuntimeName: function(runtime)
+	{
+		return "scrupload"+runtime.substr(0, 1).toUpperCase()+runtime.substr(1);
 	},
 	detectFlashVer: function(reqMajorVer, reqMinorVer, reqRevision)
 	{
@@ -218,9 +230,8 @@ $.widget('ui.scrupload', {
 	},
 	destroy: function()
 	{
-		this.container.remove();
-		this.queue_array = [];
-		this.button = undefined;
+		this.element[this._getRuntimeName(this.current_runtime)]("destroy");
+		this.current_runtime = undefined;
 		
 		$.Widget.prototype.destroy.apply(this, arguments);
 		return this;
