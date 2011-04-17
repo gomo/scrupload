@@ -148,6 +148,10 @@ $.widget('ui.scropThumb', {
 			}
 		}));
 	},
+	changeRuntime: function(runtime)
+	{
+		this.element.scrupload('start', runtime);
+	},
 	_closeDialog: function()
 	{
 		this._trigger('onDialogClose', null, {
