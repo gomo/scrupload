@@ -10,9 +10,56 @@
 	<script type="text/javascript" src="/scrupload/src/jquery.ui.scrupload.all.js"></script>
 	<script type="text/javascript">
 		$(function(){
+
+			$("#button_http").scruploadHttp({
+				url: '/scrupload/sample/upload.php',
+				post_params: {hoge: 123},
+				get_params:{huga: 456},
+				size_limit: "8MB",
+				types: "jpg|jpeg|gif|png|bmp",
+				queue_limit: 3,
+				onInit: function(event, ui)
+				{
+					display(ui.element, 'init', ui);
+				},
+				onSelect: function(event, ui)
+				{
+					display(ui.element, 'select', ui);
+				},
+				onProgress: function(event, ui)
+				{
+					display(ui.element, 'progress', ui);
+				},
+				onFileComplete: function(event, ui)
+				{
+					display(ui.element, 'file complete', ui);
+				},
+				onButtonOver: function(event, ui)
+				{
+					display(ui.element, 'button over', ui);
+				},
+				onButtonDown: function(event, ui)
+				{
+					display(ui.element, 'button down', ui);
+				},
+				onButtonOut: function(event, ui)
+				{
+					display(ui.element, 'button out', ui);
+				},
+				onComplete: function(event, ui)
+				{
+					display(ui.element, 'complete', ui);
+				},
+				onError: function(event, ui)
+				{
+					display(ui.element, 'error', ui);
+				}
+			});
+
+			
 			$("#button_html4").scruploadHtml4({
 				//html4_use_input: true,
-				url: '/scrupload/upload.php',
+				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
@@ -59,7 +106,7 @@
 
 
 			$("#button_swfuplod").scruploadSwfupload({
-				url: '/scrupload/upload.php',
+				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
@@ -118,7 +165,7 @@
 
 			$("#button_auto").scrupload({
 				runtimes: 'swfupload|html4',
-				url: '/scrupload/upload.php',
+				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
@@ -253,6 +300,13 @@
 <p>Scrupload demo.</p>
 
 <div>
+<h1>http</h1>
+<div id="button_http"></div>
+<a href="javascript:void(0)" onclick="$('#button_http').scruploadHttp('destroy')">destroy</a>
+<div class="display"></div>
+</div>
+
+<div>
 <h1>html4</h1>
 <div id="button_html4"></div>
 <a href="javascript:void(0)" onclick="$('#button_html4').scruploadHtml4('destroy')">destroy</a>
@@ -269,6 +323,9 @@
 <div>
 <h1>Auto</h1>
 <div id="button_auto"></div>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'http')">http</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html4')">html4</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'swfupload')">swfupload</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('destroy')">destroy</a>
 <div class="display"></div>
 </div>
