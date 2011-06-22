@@ -11,17 +11,21 @@ $.widget('ui.scrupload', {
 		this.isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
 		
 		var self = this,
-			runtimes = {
-				swfupload : self.detectFlashVer(8, 0, 0) && window.SWFUpload,
-				http: true,
-				html4: true
-			},
+			runtimes,
 			list = self.options.runtimes.split("|"),
 			target,
-			i
+			i,
+			check_html5
 		;
 		
-		
+		check_html5 = $('<input type="file" />').appendTo("body").hide();
+		runtimes = {
+			html5: !!check_html5[0].files,
+			swfupload: self.detectFlashVer(8, 0, 0) && window.SWFUpload,
+			http: true,
+			html4: true
+		};
+		check_html5.remove();
 		
 		list.push("html4");
 		for(i=0; i<list.length; i++)

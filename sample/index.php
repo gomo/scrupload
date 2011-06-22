@@ -11,6 +11,56 @@
 	<script type="text/javascript">
 		$(function(){
 
+
+
+			$("#button_html5").scruploadHtml5({
+				url: '/scrupload/sample/upload.php',
+				post_params: {hoge: 123},
+				get_params:{huga: 456},
+				size_limit: "8MB",
+				types: "jpg|jpeg|gif|png|bmp",
+				queue_limit: 3,
+				onInit: function(event, ui)
+				{
+					display(ui.element, 'init', ui);
+				},
+				onSelect: function(event, ui)
+				{
+					display(ui.element, 'select', ui);
+				},
+				onProgress: function(event, ui)
+				{
+					display(ui.element, 'progress', ui);
+				},
+				onFileComplete: function(event, ui)
+				{
+					display(ui.element, 'file complete', ui);
+				},
+				onButtonOver: function(event, ui)
+				{
+					//display(ui.element, 'button over', ui);
+				},
+				onButtonDown: function(event, ui)
+				{
+					//display(ui.element, 'button down', ui);
+				},
+				onButtonOut: function(event, ui)
+				{
+					//display(ui.element, 'button out', ui);
+				},
+				onComplete: function(event, ui)
+				{
+					display(ui.element, 'complete', ui);
+				},
+				onError: function(event, ui)
+				{
+					display(ui.element, 'error', ui);
+				}
+			});
+
+
+			
+			
 			$("#button_http").scruploadHttp({
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
@@ -164,7 +214,7 @@
 
 
 			$("#button_auto").scrupload({
-				runtimes: 'swfupload|html4',
+				runtimes: 'html5|swfupload|html4',
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
@@ -215,14 +265,6 @@
 					display(ui.element, 'error', ui);
 				}
 			});
-
-
-
-
-
-
-			
-			
 		});
 
 
@@ -298,6 +340,13 @@
 </head>
 <body>
 <p>Scrupload demo.</p>
+
+<div>
+<h1>html5</h1>
+<div id="button_html5"></div>
+<a href="javascript:void(0)" onclick="$('#button_html5').scruploadHtml5('destroy')">destroy</a>
+<div class="display"></div>
+</div>
 
 <div>
 <h1>http</h1>

@@ -32,6 +32,7 @@ if(window.SWFUpload)
 			
 			self.swfuploader = null;
 			setting = $.extend(self.options.swfupload, {
+				file_upload_limit: self.options.upload_limit||0,
 				file_post_name: self.options.file_post_name,
 				upload_url: self.options.url,
 				file_size_limit: self.options.size_limit,
@@ -134,6 +135,16 @@ if(window.SWFUpload)
 					
 					uploaded = [];
 					files = {};
+				},
+				file_queue_error_handler:function(file, code, message){
+					self._trigger('onError', null, {
+						element: self.element,
+						file: null,
+						error: scrupload.ERROR_QUEUE_LIMIT,
+						runtime: self.runtime,
+						options: self.options
+					});
+					
 				}
 			});
 			

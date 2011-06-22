@@ -5,6 +5,7 @@
 cat /home/sites/www.artists-navi.com/web/scrupload/src/jquery.scrupload.js\
  /home/sites/www.artists-navi.com/web/scrupload/src/runtimes/jquery.ui.scruploadHttp.js\
  /home/sites/www.artists-navi.com/web/scrupload/src/runtimes/jquery.ui.scruploadHtml4.js\
+ /home/sites/www.artists-navi.com/web/scrupload/src/runtimes/jquery.ui.scruploadHtml5.js\
  /home/sites/www.artists-navi.com/web/scrupload/src/runtimes/jquery.ui.scruploadSwfupload.js\
  /home/sites/www.artists-navi.com/web/scrupload/src/jquery.ui.scrupload.js\
  > /home/sites/www.artists-navi.com/web/scrupload/src/jquery.ui.scrupload.all.js
