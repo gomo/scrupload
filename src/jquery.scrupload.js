@@ -33,7 +33,14 @@ scr.uniqid = function(prefix)
 scr.buildUrlQuery = function(url, params)
 {
 	var q = $.param(params);
-	return q.indexOf("?") != -1 ? url+"&"+q : url+"?"+q;
+	if(!q)
+	{
+		return url;
+	}
+	else
+	{
+		return q.indexOf("?") != -1 ? url+"&"+q : url+"?"+q;
+	}
 };
 
 scr.generateElementId = function(element)
