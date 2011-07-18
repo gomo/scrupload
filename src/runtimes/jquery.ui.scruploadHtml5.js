@@ -28,14 +28,15 @@ $.widget('ui.scruploadHtml5', {
 	{
 		var self = this,input_name;
 		
+		input_name = self.options.file_post_name;
 		if(self.options.queue_limit > 1)
 		{
-			input_name = self.options.file_post_name+'[]';
+			//input_name = self.options.file_post_name+'[]';
 			self.input = $('<input type="file" name="'+input_name+'" multiple />');
 		}
 		else
 		{
-			input_name = self.options.file_post_name;
+			//input_name = self.options.file_post_name;
 			self.input = $('<input type="file" name="'+input_name+'" />');
 		}
 		
