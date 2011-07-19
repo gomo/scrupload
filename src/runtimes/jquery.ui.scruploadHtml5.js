@@ -47,6 +47,7 @@ $.widget('ui.scruploadHtml5', {
 		
 		self.input.change(function(){
 			
+			console.info(self.options.upload_limit && this.files.length > self.options.upload_limit);
 			//queue_limitのチェック
 			if(self.options.upload_limit && this.files.length > self.options.upload_limit)
 			{
@@ -85,6 +86,7 @@ $.widget('ui.scruploadHtml5', {
 			for(var i=0; i<this.files.length; i++)
 			{
 				file = scrupload.createFile(this.files[i].fileName, self.options);
+				
 				self.queue_array.push(file);
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
