@@ -61,7 +61,7 @@ $.widget('ui.scruploadHtml5', {
 				return;
 			}
 			
-			var url = self.options.url,
+			var url,
 				form,
 				filename = 'n/a',
 				result,
@@ -97,7 +97,7 @@ $.widget('ui.scruploadHtml5', {
 				}
 				
 				//GET作成
-				url = scrupload.buildUrlQuery(url, file.get);
+				url = scrupload.buildUrlQuery(self.options.url, file.get);
 				form.attr("action", url);
 				
 				self._trigger('onSelect', null, {
