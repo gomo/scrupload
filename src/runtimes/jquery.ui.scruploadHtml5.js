@@ -46,8 +46,6 @@ $.widget('ui.scruploadHtml5', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
-			
-			console.info(self.options.upload_limit && this.files.length > self.options.upload_limit);
 			//queue_limitのチェック
 			if(self.options.upload_limit && this.files.length > self.options.upload_limit)
 			{
@@ -72,7 +70,8 @@ $.widget('ui.scruploadHtml5', {
 				xhr,
 				check_interval,
 				selected_count = this.files.length,
-				uploaded = []
+				uploaded = [],
+				file
 				;
 			
 			self.element.addClass("scr_uploading");
@@ -86,8 +85,9 @@ $.widget('ui.scruploadHtml5', {
 			for(var i=0; i<this.files.length; i++)
 			{
 				file = scrupload.createFile(this.files[i].fileName, self.options);
-				
 				self.queue_array.push(file);
+				
+				//postデータの作成
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
 				
@@ -96,6 +96,7 @@ $.widget('ui.scruploadHtml5', {
 					fd.append(key, file.post[key]);
 				}
 				
+				//GET作成
 				url = scrupload.buildUrlQuery(url, file.get);
 				form.attr("action", url);
 				
@@ -107,39 +108,8 @@ $.widget('ui.scruploadHtml5', {
 				});
 				
 				xhr = new XMLHttpRequest();
-				//TODO post getの送信
-				xhr.upload.addEventListener("progress", function(event){
-					file.status = scrupload.UPLOADING;
-					if (event.lengthComputable) {
-						var percent = Math.round(event.loaded * 100 / event.total);
-						self._trigger('onProgress', null, {
-							element: self.element,
-							runtime: self.runtime,
-							file: file,
-							progress: {
-								percent: percent,
-								bytes_loaded: event.loaded,
-								bytes_total: event.total,
-								options: self.options
-							}
-						});
-					}
-				}, false);
-				xhr.addEventListener("load", function(event){
-					file.status = scrupload.DONE;
-					self._trigger('onFileComplete', null, {
-						element: self.element,
-						runtime: self.runtime,
-						file: file,
-						response: event.target.responseText,
-						options: self.options
-					});
-					
-					uploaded.push(file);
-					
-				}, false);
-				//xhr.addEventListener("error", uploadFailed, false);
-				//xhr.addEventListener("abort", uploadCanceled, false);
+				
+				self._setAjaxEventListener(xhr, file, uploaded);
 				
 				xhr.open("POST", url);
 				xhr.send(fd);
@@ -162,6 +132,43 @@ $.widget('ui.scruploadHtml5', {
 				}
 			}, 80);
 		});
+	},
+	_setAjaxEventListener: function(xhr, file, uploaded)
+	{
+		var self = this;
+		xhr.upload.addEventListener("progress", function(event){
+			file.status = scrupload.UPLOADING;
+			if (event.lengthComputable) {
+				var percent = Math.round(event.loaded * 100 / event.total);
+				self._trigger('onProgress', null, {
+					element: self.element,
+					runtime: self.runtime,
+					file: file,
+					progress: {
+						percent: percent,
+						bytes_loaded: event.loaded,
+						bytes_total: event.total,
+						options: self.options
+					}
+				});
+			}
+		}, false);
+		xhr.addEventListener("load", function(event){
+			
+			file.status = scrupload.DONE;
+			self._trigger('onFileComplete', null, {
+				element: self.element,
+				runtime: self.runtime,
+				file: file,
+				response: event.target.responseText,
+				options: self.options
+			});
+			
+			uploaded.push(file);
+			
+		}, false);
+		//xhr.addEventListener("error", uploadFailed, false);
+		//xhr.addEventListener("abort", uploadCanceled, false);
 	},
 	_resetInterface:function()
 	{
