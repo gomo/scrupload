@@ -50,7 +50,7 @@ if(window.SWFUpload)
 				file_queued_handler: function(swf_file){
 					var file = scrupload.createFile(swf_file.name, self.options);
 					
-					//queue_limitのチェック
+					/*//queue_limitのチェック
 					if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
 					{
 						file.status = scrupload.FAILED;
@@ -76,7 +76,27 @@ if(window.SWFUpload)
 							file: file,
 							options: self.options
 						});
+					}*/
+					
+					retOnSelect = self._trigger('onSelect', null, {
+						element: self.element,
+						runtime: self.runtime,
+						file: file,
+						options: self.options
+					});
+					
+					if(retOnSelect !== false)
+					{
+						self.queue_array.push(file);
+						uploaded.push(file);
+						files[swf_file.id] = file;
 					}
+					else
+					{
+						this.cancelUpload(swf_file.id);
+					}
+					
+					return retOnSelect;
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					this.startUpload();

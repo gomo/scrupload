@@ -10,8 +10,13 @@
 	<script type="text/javascript" src="/scrupload/src/jquery.ui.scrupload.all.js"></script>
 	<script type="text/javascript">
 		$(function(){
-
-
+			var limit = 3;
+			var count = {
+				html5: 0,
+				http:  0,
+				html4: 0,
+				swf:   0
+			};
 
 			$("#button_html5").scruploadHtml5({
 				url: '/scrupload/sample/upload.php',
@@ -19,7 +24,6 @@
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				queue_limit: 3,
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
@@ -27,6 +31,12 @@
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
+					if(count.html5 >= limit)
+					{
+						return false;
+					}
+
+					++count.html5;
 				},
 				onProgress: function(event, ui)
 				{
@@ -67,7 +77,6 @@
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				queue_limit: 3,
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
@@ -75,6 +84,12 @@
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
+					if(count.http >= limit)
+					{
+						return false;
+					}
+
+					++count.http;
 				},
 				onProgress: function(event, ui)
 				{
@@ -86,15 +101,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -114,7 +129,6 @@
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				queue_limit: 3,
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
@@ -122,6 +136,12 @@
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
+					if(count.html4 >= limit)
+					{
+						return false;
+					}
+
+					++count.html4;
 				},
 				onProgress: function(event, ui)
 				{
@@ -133,15 +153,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -162,7 +182,6 @@
 				size_limit: "8MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
-				queue_limit: 3,
 				swfupload: {
 					button_image_url: '/img/upload_splite.gif',
 					button_width: 148,
@@ -176,6 +195,12 @@
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
+					if(count.swf >= limit)
+					{
+						return false;
+					}
+
+					++count.swf;
 				},
 				onProgress: function(event, ui)
 				{
@@ -187,15 +212,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -221,7 +246,6 @@
 				size_limit: "8MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
-				queue_limit: 3,
 				swfupload: {
 					button_image_url: '/img/upload_splite.gif',
 					button_width: 148,
@@ -246,15 +270,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{

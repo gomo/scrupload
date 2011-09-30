@@ -1,6 +1,7 @@
 (function($){
 $.widget('ui.scruploadHtml5', {
 	options: scrupload.defaultOptions({
+		mutiple_select: true
 	}),
 	_create: function()
 	{	
@@ -29,14 +30,12 @@ $.widget('ui.scruploadHtml5', {
 		var self = this,input_name;
 		
 		input_name = self.options.file_post_name;
-		if(self.options.queue_limit > 1)
+		if(self.options.mutiple_select)
 		{
-			//input_name = self.options.file_post_name+'[]';
 			self.input = $('<input type="file" name="'+input_name+'" multiple />');
 		}
 		else
 		{
-			//input_name = self.options.file_post_name;
 			self.input = $('<input type="file" name="'+input_name+'" />');
 		}
 		
@@ -46,8 +45,8 @@ $.widget('ui.scruploadHtml5', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
-			//queue_limitのチェック
-			if(self.options.upload_limit && this.files.length > self.options.upload_limit)
+			/*//queue_limitのチェック
+			if(self.options.queue_limit && this.files.length > self.options.queue_limit)
 			{
 				self._trigger('onError', null, {
 					element: self.element,
@@ -59,7 +58,7 @@ $.widget('ui.scruploadHtml5', {
 				self._resetInterface();
 				
 				return;
-			}
+			}*/
 			
 			var url,
 				form,
@@ -71,7 +70,8 @@ $.widget('ui.scruploadHtml5', {
 				check_interval,
 				selected_count = this.files.length,
 				uploaded = [],
-				file
+				file,
+				retOnSelect
 				;
 			
 			self.element.addClass("scr_uploading");
@@ -100,20 +100,29 @@ $.widget('ui.scruploadHtml5', {
 				url = scrupload.buildUrlQuery(self.options.url, file.get);
 				form.attr("action", url);
 				
-				self._trigger('onSelect', null, {
+				retOnSelect = self._trigger('onSelect', null, {
 					element: self.element,
 					runtime: self.runtime,
 					file: file,
 					options: self.options
 				});
 				
-				xhr = new XMLHttpRequest();
-				
-				self._setAjaxEventListener(xhr, file, uploaded);
-				
-				xhr.open("POST", url);
-				xhr.send(fd);
+				if(retOnSelect !== false)
+				{
+					xhr = new XMLHttpRequest();
+					
+					self._setAjaxEventListener(xhr, file, uploaded);
+					
+					xhr.open("POST", url);
+					xhr.send(fd);
+				}
+				else
+				{
+					--selected_count;
+				}
 			}
+			
+			self._resetInterface();
 			
 			check_interval = setInterval(function(){
 				if(selected_count == uploaded.length)
