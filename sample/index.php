@@ -183,6 +183,8 @@
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
 				swfupload: {
+					cookie: ['PHPSESSID'],
+					cookie_method: 'post',
 					button_image_url: '/img/upload_splite.gif',
 					button_width: 148,
 					button_height: 60,

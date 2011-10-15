@@ -11,24 +11,66 @@ if(window.SWFUpload)
 		}),
 		_create: function()
 		{
-			var self = this;
+			var self = this;	
 			
 			self.queue_array = [];
 			scrupload.buildDefaultPostParams(self.options);
 			
 			self._initInterface();
-		},
+		},/*
+		_loadCookie: function()
+		{
+			var tmp_cookie,tmp_keyval,i;
+			
+			this._cookie = {};
+			
+			tmp_cookie = document.cookie.split('; ');
+			for(i=0; i<tmp_cookie.length; i++)
+			{
+				tmp_keyval = tmp_cookie[i].split('=');
+				this._cookie[tmp_keyval[0]] = unescape(tmp_keyval[1]);
+			}
+		},*/
 		_initInterface: function()
 		{
 			var self = this,
 				files = {},
 				uploaded = [],
-				setting
+				setting,
+				cookie_post = {},
+				cookie_get = {},
+				i
 			;
 			
 			self.swf_container = $("<div><div></div></div>").appendTo(self.element);
 			self.swf_container.width(self.options.swfupload.button_width);
 			self.swf_container.height(self.options.swfupload.button_height);
+			
+			if(self.options.swfupload.cookie)
+			{
+				if(!$.cookie)
+				{
+					throw 'It is require "jquery.cookie.js" to use cookie option.';
+				}
+				
+				if((self.options.swfupload.cookie_method||'get').toLowerCase() == 'get')
+				{
+					for(i=0; i<self.options.swfupload.cookie.length; i++)
+					{
+						cookie_get[self.options.swfupload.cookie[i]] = $.cookie(self.options.swfupload.cookie[i]);
+					}
+				}
+				else
+				{
+					for(i=0; i<self.options.swfupload.cookie.length; i++)
+					{
+						cookie_post[self.options.swfupload.cookie[i]] = $.cookie(self.options.swfupload.cookie[i]);
+					}
+				}
+				
+				delete self.options.swfupload.cookie;
+				delete self.options.swfupload.cookie_method;
+			}
 			
 			self.swfuploader = null;
 			setting = $.extend(self.options.swfupload, {
@@ -108,10 +150,11 @@ if(window.SWFUpload)
 					
 					//post
 					file.post.id = file.id;
-					this.setPostParams(file.post);
+					
+					this.setPostParams($.extend(cookie_post, file.post));
 					
 					//get
-					url = scrupload.buildUrlQuery(self.options.url, file.get);
+					url = scrupload.buildUrlQuery(self.options.url, $.extend(cookie_get, file.get));
 					this.setUploadURL(url);
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
