@@ -45,21 +45,6 @@ $.widget('ui.scruploadHtml5', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
-			/*//queue_limitのチェック
-			if(self.options.queue_limit && this.files.length > self.options.queue_limit)
-			{
-				self._trigger('onError', null, {
-					element: self.element,
-					file: null,
-					error: scrupload.ERROR_QUEUE_LIMIT,
-					runtime: self.runtime,
-					options: self.options
-				});
-				self._resetInterface();
-				
-				return;
-			}*/
-			
 			var url,
 				form,
 				filename = 'n/a',
@@ -84,7 +69,7 @@ $.widget('ui.scruploadHtml5', {
 			
 			for(var i=0; i<this.files.length; i++)
 			{
-				file = scrupload.createFile(this.files[i].fileName, self.options);
+				file = scrupload.createFile(this.files[i].name||this.files[i].fileName, self.options);
 				self.queue_array.push(file);
 				
 				//postデータの作成
@@ -100,25 +85,28 @@ $.widget('ui.scruploadHtml5', {
 				url = scrupload.buildUrlQuery(self.options.url, file.get);
 				form.attr("action", url);
 				
-				retOnSelect = self._trigger('onSelect', null, {
+				file.upload = self._trigger('onSelect', null, {
 					element: self.element,
 					runtime: self.runtime,
 					file: file,
 					options: self.options
 				});
 				
-				if(retOnSelect !== false)
+				if(!self.options.interval)
 				{
-					xhr = new XMLHttpRequest();
-					
-					self._setAjaxEventListener(xhr, file, uploaded);
-					
-					xhr.open("POST", url);
-					xhr.send(fd);
-				}
-				else
-				{
-					--selected_count;
+					if(file.upload !== false)
+					{
+						xhr = new XMLHttpRequest();
+						
+						self._setAjaxEventListener(xhr, file, uploaded);
+						
+						xhr.open("POST", url);
+						xhr.send(fd);
+					}
+					else
+					{
+						--selected_count;
+					}
 				}
 			}
 			
@@ -176,8 +164,6 @@ $.widget('ui.scruploadHtml5', {
 			uploaded.push(file);
 			
 		}, false);
-		//xhr.addEventListener("error", uploadFailed, false);
-		//xhr.addEventListener("abort", uploadCanceled, false);
 	},
 	_resetInterface:function()
 	{
