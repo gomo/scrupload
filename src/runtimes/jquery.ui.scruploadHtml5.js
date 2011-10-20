@@ -101,13 +101,19 @@ $.widget('ui.scruploadHtml5', {
 				}
 			}
 			
+			self._trigger('onStart', null, {
+				element: self.element,
+				runtime: self.runtime,
+				files: self.queue_array,
+				options: self.options
+			});
+			
 			next = self.queue_array.shift();
 			if(next)
 			{
 				self._upload(next, uploaded);
 			}
-			
-			if(self.queue_array.length === 0)
+			else
 			{
 				self._onComplete(uploaded);
 			}
@@ -165,21 +171,16 @@ $.widget('ui.scruploadHtml5', {
 			
 			uploaded.push(file);
 			
-			next = self.queue_array.shift();
-			setTimeout(function(){
-				
-				if(next)
-				{
-					self._upload(next, uploaded);
-				}
-				
-			}, self.options.interval);
-			
 			if(self.queue_array.length == 0)
 			{
 				self._onComplete(uploaded);
 			}
-			
+			else
+			{
+				setTimeout(function(){
+					self._upload(self.queue_array.shift(), uploaded);
+				}, self.options.interval);
+			}
 		}, false);
 	},
 	_onComplete: function(uploaded)

@@ -180,22 +180,6 @@ scr.submitIframForm = function(form, filename, widget){
 		}
 	}
 	
-	/*//queue_limitのチェック
-	if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
-	{
-		file.status = scrupload.FAILED;
-		self._trigger('onError', null, {
-			element: self.element,
-			file: file,
-			error: scrupload.ERROR_QUEUE_LIMIT,
-			runtime: self.runtime,
-			options: self.options
-		});
-		self._resetInterface();
-		
-		return;
-	}*/
-	
 	file.upload = self._trigger('onSelect', null, {
 		element: self.element,
 		runtime: self.runtime,
@@ -205,7 +189,12 @@ scr.submitIframForm = function(form, filename, widget){
 	
 	if(file.upload !== false)
 	{
-		//self.queue_array.push(file);
+		self._trigger('onStart', null, {
+			element: self.element,
+			runtime: self.runtime,
+			files: [file],
+			options: self.options
+		});
 		
 		self._trigger('onFileStart', null, {
 			element: self.element,
@@ -312,7 +301,7 @@ scr.disableInterface = function(element, options){
 			.css('top', 0)
 			.css('left', 0)
 			.css('z-index', 10000)
-			.css('background-color', '#000')
+			//.css('background-color', '#000')
 			.offset(element.offset())
 			.width(element.width())
 			.height(element.height());

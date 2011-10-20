@@ -27,11 +27,11 @@
 				},
 				onSelect: function(event, ui)
 				{
-					++count;
+					/*++count;
 					if(count > limit)
 					{
 						return false;
-					}
+					}*/
 					
 					//display(ui.element, 'select', ui);
 				},
@@ -94,12 +94,12 @@
 				},
 				onSelect: function(event, ui)
 				{
-					++count;
+					/*++count;
 
 					if(count > limit)
 					{
 						return false;
-					}
+					}*/
 					//display(ui.element, 'select', ui);
 				},
 				onFileStart: function(event, ui)

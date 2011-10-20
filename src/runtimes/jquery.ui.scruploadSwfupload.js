@@ -124,6 +124,12 @@ if(window.SWFUpload)
 					
 					if(self.queue_array.length > 0)
 					{
+						self._trigger('onStart', null, {
+							element: self.element,
+							runtime: self.runtime,
+							files: self.queue_array,
+							options: self.options
+						});
 						scrupload.disableInterface(self.element, self.options);
 						
 						this.startUpload();
