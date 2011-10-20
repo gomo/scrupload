@@ -1,7 +1,8 @@
 (function($){
 $.widget('ui.scruploadHtml5', {
 	options: scrupload.defaultOptions({
-		mutiple_select: true
+		mutiple_select: true,
+		interval: 0
 	}),
 	_create: function()
 	{	
@@ -97,21 +98,18 @@ $.widget('ui.scruploadHtml5', {
 					self.queue_array.push(file);
 				}
 				
-				if(!('interval' in self.options))
+				/*if(!('interval' in self.options))
 				{
 					if(file.upload !== false)
 					{
 						self._upload(file, uploaded);
 					}
-				}
+				}*/
 			}
 			
-			if('interval' in self.options)
+			if(self.queue_array[uploaded.length])
 			{
-				if(self.queue_array[uploaded.length])
-				{
-					self._upload(self.queue_array[uploaded.length], uploaded);
-				}
+				self._upload(self.queue_array[uploaded.length], uploaded);
 			}
 			
 			if(self.queue_array.length === 0)
@@ -121,24 +119,6 @@ $.widget('ui.scruploadHtml5', {
 			
 			
 			self._resetInterface();
-			
-			//完全終了をチェック
-			/*check_interval = setInterval(function(){
-				if(selected_count == uploaded.length)
-				{
-					clearInterval(check_interval);
-					self._trigger('onComplete', null, {
-						element: self.element,
-						runtime: self.runtime,
-						uploaded: uploaded,
-						files: self.queue_array,
-						options: self.options
-					});
-					
-					input.val("");
-					uploaded = [];
-				}
-			}, 80);*/
 		});
 	},
 	_upload: function(file, uploaded)
@@ -147,8 +127,7 @@ $.widget('ui.scruploadHtml5', {
 		
 		this._setAjaxEventListener(xhr, file, uploaded);
 		
-		xhr.open("POST", file.html5.uri);
-		xhr.send(file.html5.formData);
+		
 		
 		this._trigger('onFileStart', null, {
 			element: this.element,
@@ -156,6 +135,9 @@ $.widget('ui.scruploadHtml5', {
 			file: file,
 			options: this.options
 		});
+		
+		xhr.open("POST", file.html5.uri);
+		xhr.send(file.html5.formData);
 	},
 	_setAjaxEventListener: function(xhr, file, uploaded)
 	{
@@ -190,14 +172,11 @@ $.widget('ui.scruploadHtml5', {
 			
 			uploaded.push(file);
 			
-			if('interval' in self.options)
+			if(self.queue_array[uploaded.length])
 			{
-				if(self.queue_array[uploaded.length])
-				{
-					setTimeout(function(){
-						self._upload(self.queue_array[uploaded.length], uploaded);
-					}, self.options.interval);
-				}
+				setTimeout(function(){
+					self._upload(self.queue_array[uploaded.length], uploaded);
+				}, self.options.interval);
 			}
 			
 			if(self.queue_array.length == uploaded.length)

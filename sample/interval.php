@@ -20,7 +20,7 @@
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				interval: 1000,
+				//interval: 1000,
 				onInit: function(event, ui)
 				{
 					//display(ui.element, 'init', ui);
@@ -37,7 +37,7 @@
 				},
 				onFileStart: function(event, ui)
 				{
-					//display(ui.element, 'start', ui);
+					display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{
