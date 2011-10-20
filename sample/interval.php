@@ -12,24 +12,36 @@
 	<script type="text/javascript">
 		$(function(){
 
+			var limit = 2;
+			var count = 0
 			$("#button_html5").scruploadHtml5({
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				interval: 100,
+				interval: 1000,
 				onInit: function(event, ui)
 				{
 					//display(ui.element, 'init', ui);
 				},
 				onSelect: function(event, ui)
 				{
+					++count;
+					if(count > limit)
+					{
+						return false;
+					}
+					
 					//display(ui.element, 'select', ui);
+				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{
-					//display(ui.element, 'progress', ui);
+					display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
@@ -49,7 +61,7 @@
 				},
 				onComplete: function(event, ui)
 				{
-					//display(ui.element, 'complete', ui);
+					display(ui.element, 'complete', ui);
 				},
 				onError: function(event, ui)
 				{

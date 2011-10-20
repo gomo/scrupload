@@ -50,13 +50,8 @@ $.widget('ui.scruploadHtml5', {
 				filename = 'n/a',
 				result,
 				input = $(this),
-				fd,
-				xhr,
-				check_interval,
-				selected_count = this.files.length,
 				uploaded = [],
-				file,
-				retOnSelect
+				file
 				;
 			
 			self.element.addClass("scr_uploading");
@@ -70,7 +65,7 @@ $.widget('ui.scruploadHtml5', {
 			for(var i=0; i<this.files.length; i++)
 			{
 				file = scrupload.createFile(this.files[i].name||this.files[i].fileName, self.options);
-				self.queue_array.push(file);
+				
 				
 				//postデータの作成
 				fd = new FormData();
@@ -85,6 +80,11 @@ $.widget('ui.scruploadHtml5', {
 				url = scrupload.buildUrlQuery(self.options.url, file.get);
 				form.attr("action", url);
 				
+				file.html5 = {
+					formData: fd,
+					uri: url
+				};
+				
 				file.upload = self._trigger('onSelect', null, {
 					element: self.element,
 					runtime: self.runtime,
@@ -92,27 +92,38 @@ $.widget('ui.scruploadHtml5', {
 					options: self.options
 				});
 				
-				if(!self.options.interval)
+				if(file.upload)
+				{
+					self.queue_array.push(file);
+				}
+				
+				if(!('interval' in self.options))
 				{
 					if(file.upload !== false)
 					{
-						xhr = new XMLHttpRequest();
-						
-						self._setAjaxEventListener(xhr, file, uploaded);
-						
-						xhr.open("POST", url);
-						xhr.send(fd);
-					}
-					else
-					{
-						--selected_count;
+						self._upload(file, uploaded);
 					}
 				}
 			}
 			
+			if('interval' in self.options)
+			{
+				if(self.queue_array[uploaded.length])
+				{
+					self._upload(self.queue_array[uploaded.length], uploaded);
+				}
+			}
+			
+			if(self.queue_array.length === 0)
+			{
+				self._onComplete(uploaded);
+			}
+			
+			
 			self._resetInterface();
 			
-			check_interval = setInterval(function(){
+			//完全終了をチェック
+			/*check_interval = setInterval(function(){
 				if(selected_count == uploaded.length)
 				{
 					clearInterval(check_interval);
@@ -127,7 +138,23 @@ $.widget('ui.scruploadHtml5', {
 					input.val("");
 					uploaded = [];
 				}
-			}, 80);
+			}, 80);*/
+		});
+	},
+	_upload: function(file, uploaded)
+	{
+		var xhr = new XMLHttpRequest();
+		
+		this._setAjaxEventListener(xhr, file, uploaded);
+		
+		xhr.open("POST", file.html5.uri);
+		xhr.send(file.html5.formData);
+		
+		this._trigger('onFileStart', null, {
+			element: this.element,
+			runtime: this.runtime,
+			file: file,
+			options: this.options
 		});
 	},
 	_setAjaxEventListener: function(xhr, file, uploaded)
@@ -163,7 +190,32 @@ $.widget('ui.scruploadHtml5', {
 			
 			uploaded.push(file);
 			
+			if('interval' in self.options)
+			{
+				if(self.queue_array[uploaded.length])
+				{
+					setTimeout(function(){
+						self._upload(self.queue_array[uploaded.length], uploaded);
+					}, self.options.interval);
+				}
+			}
+			
+			if(self.queue_array.length == uploaded.length)
+			{
+				self._onComplete(uploaded);
+			}
+			
 		}, false);
+	},
+	_onComplete: function(uploaded)
+	{
+		this._trigger('onComplete', null, {
+			element: this.element,
+			runtime: this.runtime,
+			uploaded: uploaded,
+			files: this.queue_array,
+			options: this.options
+		});
 	},
 	_resetInterface:function()
 	{

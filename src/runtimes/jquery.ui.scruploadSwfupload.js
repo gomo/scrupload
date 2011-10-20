@@ -120,14 +120,14 @@ if(window.SWFUpload)
 						});
 					}*/
 					
-					retOnSelect = self._trigger('onSelect', null, {
+					file.upload = self._trigger('onSelect', null, {
 						element: self.element,
 						runtime: self.runtime,
 						file: file,
 						options: self.options
 					});
 					
-					if(retOnSelect !== false)
+					if(file.upload !== false)
 					{
 						self.queue_array.push(file);
 						uploaded.push(file);
@@ -138,7 +138,7 @@ if(window.SWFUpload)
 						this.cancelUpload(swf_file.id);
 					}
 					
-					return retOnSelect;
+					return file.upload;
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					this.startUpload();
@@ -156,6 +156,13 @@ if(window.SWFUpload)
 					//get
 					url = scrupload.buildUrlQuery(self.options.url, $.extend(cookie_get, file.get));
 					this.setUploadURL(url);
+					
+					self._trigger('onFileStart', null, {
+						element: self.element,
+						runtime: self.runtime,
+						file: file,
+						options: self.options
+					});
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
 					var file = files[swf_file.id],

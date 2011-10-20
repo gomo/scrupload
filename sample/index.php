@@ -39,6 +39,10 @@
 
 					++count.html5;
 				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
+				},
 				onProgress: function(event, ui)
 				{
 					display(ui.element, 'progress', ui);
@@ -92,6 +96,10 @@
 
 					++count.http;
 				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
+				},
 				onProgress: function(event, ui)
 				{
 					display(ui.element, 'progress', ui);
@@ -143,6 +151,10 @@
 					}
 
 					++count.html4;
+				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{
@@ -205,6 +217,10 @@
 
 					++count.swf;
 				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
+				},
 				onProgress: function(event, ui)
 				{
 					display(ui.element, 'progress', ui);
@@ -262,6 +278,10 @@
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
+				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{

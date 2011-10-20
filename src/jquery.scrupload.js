@@ -155,8 +155,8 @@ scr.createFile = function(filename, options){
 
 scr.submitIframForm = function(form, filename, widget){
 	var self = widget,
-		file,
-		retOnSelect;
+		file
+		;
 	
 	file = scrupload.createFile(filename, self.options);
 	
@@ -195,16 +195,23 @@ scr.submitIframForm = function(form, filename, widget){
 		return;
 	}*/
 	
-	retOnSelect = self._trigger('onSelect', null, {
+	file.upload = self._trigger('onSelect', null, {
 		element: self.element,
 		runtime: self.runtime,
 		file: file,
 		options: self.options
 	});
 	
-	if(retOnSelect !== false)
+	if(file.upload !== false)
 	{
 		self.queue_array.push(file);
+		
+		self._trigger('onFileStart', null, {
+			element: self.element,
+			runtime: self.runtime,
+			file: file,
+			options: self.options
+		});
 		
 		form.submit(function(){
 			//post params
