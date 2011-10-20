@@ -105,7 +105,8 @@ scr.defaultOptions = function(options){
 	return $.extend({}, {
 		file_post_name: 'file',
 		post_params: {},
-		get_params: {}
+		get_params: {},
+		interval: 0
 	}, options||{});
 };
 
@@ -204,7 +205,7 @@ scr.submitIframForm = function(form, filename, widget){
 	
 	if(file.upload !== false)
 	{
-		self.queue_array.push(file);
+		//self.queue_array.push(file);
 		
 		self._trigger('onFileStart', null, {
 			element: self.element,
@@ -270,7 +271,6 @@ scr.submitIframForm = function(form, filename, widget){
 						element: self.element,
 						uploaded: [file],
 						runtime: self.runtime,
-						files: self.queue_array,
 						options: self.options
 					});
 				}
@@ -295,13 +295,42 @@ scr.submitIframForm = function(form, filename, widget){
 			element: self.element,
 			uploaded: [file],
 			runtime: self.runtime,
-			files: self.queue_array,
 			options: self.options
 		});
 	}
 };
 
+scr.disableInterface = function(element, options){
+	
+	cover = element.data('disable-cover');
+	
+	if(!cover)
+	{
+		cover = $("<div></div>")
+			.appendTo(element)
+			.css('position', 'absolute')
+			.css('top', 0)
+			.css('left', 0)
+			.css('z-index', 10000)
+			.css('background-color', '#000')
+			.offset(element.offset())
+			.width(element.width())
+			.height(element.height());
+		element.data('disable-cover', cover);
+	}
+	
+	
+	cover.show();
+};
 
+scr.enableInterface = function(element, options){
+	
+	cover = element.data('disable-cover');
+	if(cover)
+	{
+		cover.hide();
+	}
+};
 
 
 })(jQuery, (function(){ return this; })());

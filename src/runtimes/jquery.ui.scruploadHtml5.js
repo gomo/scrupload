@@ -1,8 +1,7 @@
 (function($){
 $.widget('ui.scruploadHtml5', {
 	options: scrupload.defaultOptions({
-		mutiple_select: true,
-		interval: 0
+		mutiple_select: true
 	}),
 	_create: function()
 	{	
@@ -24,7 +23,7 @@ $.widget('ui.scruploadHtml5', {
 	_initInterface: function()
 	{
 		var self = this;
-		self._createFormAndInput();
+		self._createFormAndInput();		
 	},
 	_createFormAndInput: function()
 	{
@@ -52,8 +51,11 @@ $.widget('ui.scruploadHtml5', {
 				result,
 				input = $(this),
 				uploaded = [],
-				file
+				file,
+				next
 				;
+			
+			self.input.attr('disabled', 'disabled');
 			
 			self.element.addClass("scr_uploading");
 			
@@ -97,28 +99,18 @@ $.widget('ui.scruploadHtml5', {
 				{
 					self.queue_array.push(file);
 				}
-				
-				/*if(!('interval' in self.options))
-				{
-					if(file.upload !== false)
-					{
-						self._upload(file, uploaded);
-					}
-				}*/
 			}
 			
-			if(self.queue_array[uploaded.length])
+			next = self.queue_array.shift();
+			if(next)
 			{
-				self._upload(self.queue_array[uploaded.length], uploaded);
+				self._upload(next, uploaded);
 			}
 			
 			if(self.queue_array.length === 0)
 			{
 				self._onComplete(uploaded);
 			}
-			
-			
-			self._resetInterface();
 		});
 	},
 	_upload: function(file, uploaded)
@@ -160,6 +152,7 @@ $.widget('ui.scruploadHtml5', {
 			}
 		}, false);
 		xhr.addEventListener("load", function(event){
+			var next;
 			
 			file.status = scrupload.DONE;
 			self._trigger('onFileComplete', null, {
@@ -172,14 +165,17 @@ $.widget('ui.scruploadHtml5', {
 			
 			uploaded.push(file);
 			
-			if(self.queue_array[uploaded.length])
-			{
-				setTimeout(function(){
-					self._upload(self.queue_array[uploaded.length], uploaded);
-				}, self.options.interval);
-			}
+			next = self.queue_array.shift();
+			setTimeout(function(){
+				
+				if(next)
+				{
+					self._upload(next, uploaded);
+				}
+				
+			}, self.options.interval);
 			
-			if(self.queue_array.length == uploaded.length)
+			if(self.queue_array.length == 0)
 			{
 				self._onComplete(uploaded);
 			}
@@ -192,9 +188,10 @@ $.widget('ui.scruploadHtml5', {
 			element: this.element,
 			runtime: this.runtime,
 			uploaded: uploaded,
-			files: this.queue_array,
 			options: this.options
 		});
+		
+		this._resetInterface();
 	},
 	_resetInterface:function()
 	{

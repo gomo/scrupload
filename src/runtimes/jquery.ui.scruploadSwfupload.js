@@ -40,13 +40,15 @@ if(window.SWFUpload)
 				cookie_post = {},
 				cookie_get = {},
 				i,
-				current_file_for_interval
+				current_file,
+				selected
 			;
 			
 			self.swf_container = $("<div><div></div></div>").appendTo(self.element);
 			self.swf_container.width(self.options.swfupload.button_width);
 			self.swf_container.height(self.options.swfupload.button_height);
 			
+			//cookie
 			if(self.options.swfupload.cookie)
 			{
 				if(!$.cookie)
@@ -75,7 +77,7 @@ if(window.SWFUpload)
 			
 			self.swfuploader = null;
 			setting = $.extend(self.options.swfupload, {
-				file_upload_limit: self.options.upload_limit||0,
+				//file_upload_limit: self.options.upload_limit||0,
 				file_post_name: self.options.file_post_name,
 				upload_url: self.options.url,
 				file_size_limit: self.options.size_limit,
@@ -90,9 +92,13 @@ if(window.SWFUpload)
 						options: self.options
 					});
 				},
+				file_dialog_start_handler: function(a1, a2, a3){
+					selected = false;
+				},
 				file_queued_handler: function(swf_file){
 					var file = scrupload.createFile(swf_file.name, self.options);
 					
+					selected = true;
 					file.swfupload = {file: swf_file};
 					
 					file.upload = self._trigger('onSelect', null, {
@@ -115,7 +121,17 @@ if(window.SWFUpload)
 					return file.upload;
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
-					this.startUpload();
+					
+					if(self.queue_array.length > 0)
+					{
+						scrupload.disableInterface(self.element, self.options);
+						
+						this.startUpload();
+					}
+					else if(selected)
+					{
+						self._onComplete(uploaded);
+					}
 				},
 				upload_start_handler: function(swf_file){
 					var file = files[swf_file.id],
@@ -123,40 +139,26 @@ if(window.SWFUpload)
 						swfuploader = this
 					;
 					
-					//post
-					file.post.id = file.id;
-					
-					this.setPostParams($.extend(cookie_post, file.post));
-					
-					//get
-					url = scrupload.buildUrlQuery(self.options.url, $.extend(cookie_get, file.get));
-					this.setUploadURL(url);
-					
-					if('interval' in self.options)
+					//interval
+					if(uploaded.length > 0)
 					{
-						if(uploaded.length > 0)
+						
+						if(current_file != file)
 						{
-							if(current_file_for_interval != file)
-							{
-								this.stopUpload();
+							this.stopUpload();
+							
+							setTimeout(function(){
 								
-								setTimeout(function(){
-									self._onFileStart(file);
-									current_file_for_interval = file;
-									swfuploader.startUpload();
-								}, self.options.interval);
-							}
-						}
-						else
-						{
-							self._onFileStart(file);
-							current_file_for_interval = file;
-							swfuploader.startUpload();
+								current_file = file;
+								self._startUpload(file, cookie_post, cookie_get);
+								
+							}, self.options.interval);
 						}
 					}
 					else
 					{
-						self._onFileStart(file);
+						current_file = file;
+						self._startUpload(file, cookie_post, cookie_get);
 					}
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
@@ -191,16 +193,12 @@ if(window.SWFUpload)
 					});
 				},
 				queue_complete_handler: function(num_uploaded){
-					self._trigger('onComplete', null, {
-						element: self.element,
-						runtime: self.runtime,
-						uploaded: uploaded,
-						files: self.queue_array,
-						options: self.options
-					});
+					self._onComplete(uploaded);
 					
+					scrupload.enableInterface(self.element, self.options);
 					uploaded = [];
 					files = {};
+					current_file = null;
 				},
 				file_queue_error_handler:function(file, code, message){
 					self._trigger('onError', null, {
@@ -223,14 +221,36 @@ if(window.SWFUpload)
 			
 			self.swfuploader = new SWFUpload(setting);
 		},
-		_onFileStart: function(file)
+		_onComplete: function(uploaded)
 		{
+			this._trigger('onComplete', null, {
+				element: this.element,
+				runtime: this.runtime,
+				uploaded: uploaded,
+				options: this.options
+			});
+		},
+		_startUpload: function(file, cookie_post, cookie_get)
+		{
+			this.queue_array.shift();
+			
+			//post
+			file.post.id = file.id;
+			
+			this.swfuploader.setPostParams($.extend(cookie_post, file.post));
+			
+			//get
+			url = scrupload.buildUrlQuery(this.options.url, $.extend(cookie_get, file.get));
+			this.swfuploader.setUploadURL(url);
+
 			this._trigger('onFileStart', null, {
 				element: this.element,
 				runtime: this.runtime,
 				file: file,
 				options: this.options
 			});
+			
+			this.swfuploader.startUpload();
 		},
 		getRuntime: function()
 		{

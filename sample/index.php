@@ -422,6 +422,7 @@
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'http')">http</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html4')">html4</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'swfupload')">swfupload</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html5')">http5</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('destroy')">destroy</a>
 <div class="display"></div>
 </div>

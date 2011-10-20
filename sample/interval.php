@@ -9,10 +9,10 @@
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
 	<script type="text/javascript" src="/scrupload/src/jquery.ui.scrupload.all.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript"><!--
 		$(function(){
 
-			var limit = 2;
+			var limit = 5;
 			var count = 0
 			$("#button_html5").scruploadHtml5({
 				url: '/scrupload/sample/upload.php',
@@ -20,7 +20,7 @@
 				get_params:{huga: 456},
 				size_limit: "8MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				//interval: 1000,
+				interval: 1000,
 				onInit: function(event, ui)
 				{
 					//display(ui.element, 'init', ui);
@@ -79,7 +79,7 @@
 				size_limit: "8MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
-				//interval: 1000,
+				interval: 1000,
 				swfupload: {
 					cookie: ['PHPSESSID'],
 					cookie_method: 'post',
@@ -95,6 +95,7 @@
 				onSelect: function(event, ui)
 				{
 					++count;
+
 					if(count > limit)
 					{
 						return false;
@@ -203,7 +204,7 @@
 			return "<li>"+key+" : "+value+"</li>";
 		}
 	});
-	</script>
+	--></script>
 
 </head>
 <body>
@@ -224,13 +225,8 @@
 <div class="display"></div>
 </div>
 
-<div>
-<h1>Auto</h1>
-<div id="button_auto"></div>
-<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html5')">html5</a>
-<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'swfupload')">swfupload</a>
-<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('destroy')">destroy</a>
-<div class="display"></div>
+<div style="height: 3000px">
+&nbsp;
 </div>
 
 </body>
