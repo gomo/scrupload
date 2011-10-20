@@ -37,11 +37,11 @@
 				},
 				onFileStart: function(event, ui)
 				{
-					display(ui.element, 'start', ui);
+					//display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{
-					display(ui.element, 'progress', ui);
+					//display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
@@ -79,6 +79,7 @@
 				size_limit: "8MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
+				//interval: 1000,
 				swfupload: {
 					cookie: ['PHPSESSID'],
 					cookie_method: 'post',
@@ -93,11 +94,20 @@
 				},
 				onSelect: function(event, ui)
 				{
-					display(ui.element, 'select', ui);
+					++count;
+					if(count > limit)
+					{
+						return false;
+					}
+					//display(ui.element, 'select', ui);
+				},
+				onFileStart: function(event, ui)
+				{
+					display(ui.element, 'start', ui);
 				},
 				onProgress: function(event, ui)
 				{
-					display(ui.element, 'progress', ui);
+					//display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{

@@ -39,7 +39,8 @@ if(window.SWFUpload)
 				setting,
 				cookie_post = {},
 				cookie_get = {},
-				i
+				i,
+				current_file_for_interval
 			;
 			
 			self.swf_container = $("<div><div></div></div>").appendTo(self.element);
@@ -92,33 +93,7 @@ if(window.SWFUpload)
 				file_queued_handler: function(swf_file){
 					var file = scrupload.createFile(swf_file.name, self.options);
 					
-					/*//queue_limitのチェック
-					if(self.options.queue_limit && self.queue_array.length == self.options.queue_limit)
-					{
-						file.status = scrupload.FAILED;
-						self._trigger('onError', null, {
-							element: self.element,
-							file: file,
-							error: scrupload.ERROR_QUEUE_LIMIT,
-							runtime: self.runtime,
-							options: self.options
-						});
-						
-						this.cancelUpload(swf_file.id);
-					}
-					else
-					{
-						self.queue_array.push(file);
-						uploaded.push(file);
-						files[swf_file.id] = file;
-						
-						self._trigger('onSelect', null, {
-							element: self.element,
-							runtime: self.runtime,
-							file: file,
-							options: self.options
-						});
-					}*/
+					file.swfupload = {file: swf_file};
 					
 					file.upload = self._trigger('onSelect', null, {
 						element: self.element,
@@ -130,7 +105,6 @@ if(window.SWFUpload)
 					if(file.upload !== false)
 					{
 						self.queue_array.push(file);
-						uploaded.push(file);
 						files[swf_file.id] = file;
 					}
 					else
@@ -145,7 +119,8 @@ if(window.SWFUpload)
 				},
 				upload_start_handler: function(swf_file){
 					var file = files[swf_file.id],
-						url
+						url,
+						swfuploader = this
 					;
 					
 					//post
@@ -157,12 +132,32 @@ if(window.SWFUpload)
 					url = scrupload.buildUrlQuery(self.options.url, $.extend(cookie_get, file.get));
 					this.setUploadURL(url);
 					
-					self._trigger('onFileStart', null, {
-						element: self.element,
-						runtime: self.runtime,
-						file: file,
-						options: self.options
-					});
+					if('interval' in self.options)
+					{
+						if(uploaded.length > 0)
+						{
+							if(current_file_for_interval != file)
+							{
+								this.stopUpload();
+								
+								setTimeout(function(){
+									self._onFileStart(file);
+									current_file_for_interval = file;
+									swfuploader.startUpload();
+								}, self.options.interval);
+							}
+						}
+						else
+						{
+							self._onFileStart(file);
+							current_file_for_interval = file;
+							swfuploader.startUpload();
+						}
+					}
+					else
+					{
+						self._onFileStart(file);
+					}
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
 					var file = files[swf_file.id],
@@ -186,6 +181,7 @@ if(window.SWFUpload)
 				upload_success_handler: function(swf_file, resp){
 					var file = files[swf_file.id];
 					file.status = scrupload.DONE;
+					uploaded.push(file);
 					self._trigger('onFileComplete', null, {
 						element: self.element,
 						runtime: self.runtime,
@@ -226,6 +222,15 @@ if(window.SWFUpload)
 			scrupload.initButtonEvent(self, self.swf_container);
 			
 			self.swfuploader = new SWFUpload(setting);
+		},
+		_onFileStart: function(file)
+		{
+			this._trigger('onFileStart', null, {
+				element: this.element,
+				runtime: this.runtime,
+				file: file,
+				options: this.options
+			});
 		},
 		getRuntime: function()
 		{
