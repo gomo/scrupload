@@ -178,11 +178,11 @@ if(window.SWFUpload)
 						element: self.element,
 						runtime: self.runtime,
 						file: file,
+						options: self.options,
 						progress: {
 							percent: percent,
 							bytes_loaded: bytes_loaded,
-							bytes_total: bytes_total,
-							options: self.options
+							bytes_total: bytes_total
 						}
 					});
 				},
@@ -238,6 +238,7 @@ if(window.SWFUpload)
 		},
 		_startUpload: function(file, cookie_post, cookie_get)
 		{
+			//queueの管理はswfがやっているので特に意味はないが、他と挙動を合わせるため
 			this.queue_array.shift();
 			
 			//post

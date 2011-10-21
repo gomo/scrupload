@@ -148,11 +148,11 @@ $.widget('ui.scruploadHtml5', {
 					element: self.element,
 					runtime: self.runtime,
 					file: file,
+					options: self.options,
 					progress: {
 						percent: percent,
 						bytes_loaded: event.loaded,
-						bytes_total: event.total,
-						options: self.options
+						bytes_total: event.total
 					}
 				});
 			}
