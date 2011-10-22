@@ -37,7 +37,7 @@
 				},
 				onFileStart: function(event, ui)
 				{
-					display(ui.element, 'start', ui);
+					display(ui.element, 'filestart', ui);
 				},
 				onProgress: function(event, ui)
 				{
@@ -104,7 +104,7 @@
 				},
 				onFileStart: function(event, ui)
 				{
-					display(ui.element, 'start', ui);
+					display(ui.element, 'filestart', ui);
 				},
 				onProgress: function(event, ui)
 				{
