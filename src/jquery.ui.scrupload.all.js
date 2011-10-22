@@ -597,6 +597,7 @@ $.widget('ui.scruploadHtml5', {
 			next = self.queue_array.shift();
 			if(next)
 			{
+				self._onFileStart(next);
 				self._upload(next, uploaded);
 			}
 			else
@@ -611,17 +612,17 @@ $.widget('ui.scruploadHtml5', {
 		
 		this._setAjaxEventListener(xhr, file, uploaded);
 		
-		
-		
+		xhr.open("POST", file.html5.uri);
+		xhr.send(file.html5.formData);
+	},
+	_onFileStart: function(file)
+	{
 		this._trigger('onFileStart', null, {
 			element: this.element,
 			runtime: this.runtime,
 			file: file,
 			options: this.options
 		});
-		
-		xhr.open("POST", file.html5.uri);
-		xhr.send(file.html5.formData);
 	},
 	_setAjaxEventListener: function(xhr, file, uploaded)
 	{
@@ -634,11 +635,11 @@ $.widget('ui.scruploadHtml5', {
 					element: self.element,
 					runtime: self.runtime,
 					file: file,
+					options: self.options,
 					progress: {
 						percent: percent,
 						bytes_loaded: event.loaded,
-						bytes_total: event.total,
-						options: self.options
+						bytes_total: event.total
 					}
 				});
 			}
@@ -663,8 +664,10 @@ $.widget('ui.scruploadHtml5', {
 			}
 			else
 			{
+				next = self.queue_array.shift();
+				self._onFileStart(next)
 				setTimeout(function(){
-					self._upload(self.queue_array.shift(), uploaded);
+					self._upload(next, uploaded);
 				}, self.options.interval);
 			}
 		}, false);
@@ -853,18 +856,19 @@ if(window.SWFUpload)
 						{
 							this.stopUpload();
 							
+							current_file = file;
+							self._onFileStart(file, cookie_post, cookie_get);
+							
 							setTimeout(function(){
-								
-								current_file = file;
-								self._startUpload(file, cookie_post, cookie_get);
-								
+								self.swfuploader.startUpload();
 							}, self.options.interval);
 						}
 					}
 					else
 					{
 						current_file = file;
-						self._startUpload(file, cookie_post, cookie_get);
+						self._onFileStart(file, cookie_post, cookie_get);
+						self.swfuploader.startUpload();
 					}
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
@@ -878,11 +882,11 @@ if(window.SWFUpload)
 						element: self.element,
 						runtime: self.runtime,
 						file: file,
+						options: self.options,
 						progress: {
 							percent: percent,
 							bytes_loaded: bytes_loaded,
-							bytes_total: bytes_total,
-							options: self.options
+							bytes_total: bytes_total
 						}
 					});
 				},
@@ -936,8 +940,9 @@ if(window.SWFUpload)
 				options: this.options
 			});
 		},
-		_startUpload: function(file, cookie_post, cookie_get)
+		_onFileStart: function(file, cookie_post, cookie_get)
 		{
+			//queueの管理はswfがやっているので特に意味はないが、他と挙動を合わせるため
 			this.queue_array.shift();
 			
 			//post
@@ -955,8 +960,6 @@ if(window.SWFUpload)
 				file: file,
 				options: this.options
 			});
-			
-			this.swfuploader.startUpload();
 		},
 		getRuntime: function()
 		{

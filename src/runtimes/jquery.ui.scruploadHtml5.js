@@ -111,6 +111,7 @@ $.widget('ui.scruploadHtml5', {
 			next = self.queue_array.shift();
 			if(next)
 			{
+				self._onFileStart(next);
 				self._upload(next, uploaded);
 			}
 			else
@@ -125,17 +126,17 @@ $.widget('ui.scruploadHtml5', {
 		
 		this._setAjaxEventListener(xhr, file, uploaded);
 		
-		
-		
+		xhr.open("POST", file.html5.uri);
+		xhr.send(file.html5.formData);
+	},
+	_onFileStart: function(file)
+	{
 		this._trigger('onFileStart', null, {
 			element: this.element,
 			runtime: this.runtime,
 			file: file,
 			options: this.options
 		});
-		
-		xhr.open("POST", file.html5.uri);
-		xhr.send(file.html5.formData);
 	},
 	_setAjaxEventListener: function(xhr, file, uploaded)
 	{
@@ -177,8 +178,10 @@ $.widget('ui.scruploadHtml5', {
 			}
 			else
 			{
+				next = self.queue_array.shift();
+				self._onFileStart(next);
 				setTimeout(function(){
-					self._upload(self.queue_array.shift(), uploaded);
+					self._upload(next, uploaded);
 				}, self.options.interval);
 			}
 		}, false);

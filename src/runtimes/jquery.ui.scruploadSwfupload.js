@@ -153,18 +153,19 @@ if(window.SWFUpload)
 						{
 							this.stopUpload();
 							
+							current_file = file;
+							self._onFileStart(file, cookie_post, cookie_get);
+							
 							setTimeout(function(){
-								
-								current_file = file;
-								self._startUpload(file, cookie_post, cookie_get);
-								
+								self.swfuploader.startUpload();
 							}, self.options.interval);
 						}
 					}
 					else
 					{
 						current_file = file;
-						self._startUpload(file, cookie_post, cookie_get);
+						self._onFileStart(file, cookie_post, cookie_get);
+						self.swfuploader.startUpload();
 					}
 				},
 				upload_progress_handler: function(swf_file, bytes_loaded, bytes_total){
@@ -236,7 +237,7 @@ if(window.SWFUpload)
 				options: this.options
 			});
 		},
-		_startUpload: function(file, cookie_post, cookie_get)
+		_onFileStart: function(file, cookie_post, cookie_get)
 		{
 			//queueの管理はswfがやっているので特に意味はないが、他と挙動を合わせるため
 			this.queue_array.shift();
@@ -256,8 +257,6 @@ if(window.SWFUpload)
 				file: file,
 				options: this.options
 			});
-			
-			this.swfuploader.startUpload();
 		},
 		getRuntime: function()
 		{
