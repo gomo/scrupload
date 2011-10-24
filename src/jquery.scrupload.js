@@ -198,7 +198,7 @@ scr.initButtonEvent = function(widget, element){
 scr.createFile = function(file, options){
 	
 	return {
-		id : (options.file_id_prefix||'scrupload-file-'+(++file_count)),
+		id : (options.file_id_prefix||'scrfile-'+(++file_count)),
 		time: new Date(),
 		filename: file.name||file.fileName,
 		size: file.size,
