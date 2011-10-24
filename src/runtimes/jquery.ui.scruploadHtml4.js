@@ -9,7 +9,7 @@ $.widget('ui.scruploadHtml4', {
 		self.element.addClass("scr_html4_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'html4', object: self.input};

@@ -14,8 +14,9 @@ scr.UPLOADING = 2;
 scr.FAILED = 3;
 scr.DONE = 4;
 
-scr.ERROR_TYPE = 10;
-scr.ERROR_SIZE_LIMIT = 11;
+scr.ERROR_TYPE = 'TYPE';
+scr.ERROR_SIZE = 'SIZE';
+scr.ERROR_HTTP = 'HTTP';
 //scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function(prefix)
@@ -67,7 +68,7 @@ scr.generateElementId = function(element)
  * @param options
  * @returns
  */
-scr.buildDefaultPostParams = function(options){
+scr.buildDefaultOptions = function(options){
 	
 	if(options.types)
 	{
@@ -79,21 +80,82 @@ scr.buildDefaultPostParams = function(options){
 	{
 		options.post_params.size_limit = options.size_limit;
 	}
+	
+	//size_limitをバイトにする
+	if(options.size_limit)
+	{
+		var limit = options.size_limit;
+		var result;
+		if(result = limit.match(/^([0-9]+)MB$/i))
+		{
+			options.size_limit = result[1] * 1024 * 1024;
+		}
+		else if(result = limit.match(/^([0-9]+)KB$/i))
+		{
+			options.size_limit = result[1] * 1024;
+		}
+		else if(result = limit.match(/^([0-9]+)B?$/i))
+		{
+			options.size_limit = result[1];
+		}
+		else
+		{
+			throw options.size_limit+' is illegal size_limit value.';
+		}
+	}
 };
 
 /**
  * 拡張子をチェックする
- * @param types
- * @param filename
- * @returns {Boolean}
+ * @param widget
+ * @param file
  */
-scr.checkTypes = function(options, file){
-	
-	var list = options.types.split("|"), i;
-	return $.inArray(file.type, list) != -1;
+scr.checkTypes = function(widget, file)
+{
+	if(file.upload !== false && widget.options.types)
+	{
+		var list = widget.options.types.split("|"), i;
+		if($.inArray(file.type, list) == -1)
+		{
+			file.upload = false;
+			file.status = scrupload.FAILED;
+			widget._trigger('onError', null, {
+				element: widget.element,
+				file: file,
+				error: scrupload.ERROR_TYPE,
+				runtime: widget.runtime,
+				options: widget.options
+			});
+		}
+	}
 };
 
-scr.defaultOptions = function(options){
+/**
+ * サイズをチェック
+ * @param widget
+ * @param file
+ */
+scr.checkSize = function(widget, file)
+{
+	if(file.upload !== false && widget.options.size_limit && file.size)
+	{
+		if(file.size > widget.options.size_limit)
+		{
+			file.upload = false;
+			file.status = scrupload.FAILED;
+			widget._trigger('onError', null, {
+				element: widget.element,
+				file: file,
+				error: scrupload.ERROR_SIZE,
+				runtime: widget.runtime,
+				options: widget.options
+			});
+		}
+	}
+};
+
+scr.defaultOptions = function(options)
+{	
 	return $.extend({}, {
 		file_post_name: 'file',
 		post_params: {},
@@ -170,7 +232,7 @@ scr.detectFileType = function(file)
 	return type.toLowerCase();
 };
 
-scr.submitIframForm = function(form, filename, widget){
+scr.submitIframForm = function(form, filename, widget, after_select){
 	var self = widget,
 		file
 		;
@@ -184,22 +246,16 @@ scr.submitIframForm = function(form, filename, widget){
 		options: self.options
 	});
 	
+	(after_select||$.noop)(file);
+	
 	//file typeのチェック
-	if(self.options.types && filename != 'n/a')
+	if(filename != 'n/a')
 	{
-		if(!scrupload.checkTypes(self.options, file))
-		{
-			file.upload = false;
-			file.status = scrupload.FAILED;
-			self._trigger('onError', null, {
-				element: self.element,
-				file: file,
-				error: scrupload.ERROR_TYPE,
-				runtime: self.runtime,
-				options: self.options
-			});
-		}
+		scrupload.checkTypes(self, file);
 	}
+	
+	//size check
+	//html4/httpはサイズのチェックは出来ません
 	
 	self._trigger('onStart', null, {
 		element: self.element,
@@ -350,7 +406,7 @@ $.widget('ui.scruploadHttp', {
 		self.element.addClass("scr_http_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'http', object: self.input};
@@ -375,7 +431,8 @@ $.widget('ui.scruploadHttp', {
 		button.click(function(){
 			var form = $('<form action="'+self.options.url+'" method="post" />'),
 			filename = 'n/a',
-			button = $(this)
+			button = $(this),
+			value = self.input.val()
 			;
 		
 			self.element.addClass("scr_uploading");
@@ -386,12 +443,25 @@ $.widget('ui.scruploadHttp', {
 				.appendTo(self.element)
 				.append(self.container);
 			
-			if(filename_regex.exec(self.input.val()))
+			if(filename_regex.exec(value))
 			{
 				filename = RegExp.$1;
 			}
 			
-			scrupload.submitIframForm(form, filename, self);
+			scrupload.submitIframForm(form, filename, self, function(file){
+				if(file.upload !== false && !value.match(/^https?:\/\//))
+				{
+					file.upload = false;
+					file.status = scrupload.FAILED;
+					self._trigger('onError', null, {
+						element: self.element,
+						file: file,
+						error: scrupload.ERROR_HTTP,
+						runtime: self.runtime,
+						options: self.options
+					});
+				}
+			});
 			
 			return false;
 		});
@@ -425,7 +495,7 @@ $.widget('ui.scruploadHtml4', {
 		self.element.addClass("scr_html4_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'html4', object: self.input};
@@ -510,7 +580,7 @@ $.widget('ui.scruploadHtml5', {
 		self.element.addClass("scr_html5_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'html5', object: self.input};
@@ -596,18 +666,10 @@ $.widget('ui.scruploadHtml5', {
 				});
 				
 				//type check
-				if(self.options.types && !scrupload.checkTypes(self.options, file))
-				{
-					file.upload = false;
-					file.status = scrupload.FAILED;
-					self._trigger('onError', null, {
-						element: self.element,
-						file: file,
-						error: scrupload.ERROR_TYPE,
-						runtime: self.runtime,
-						options: self.options
-					});
-				}
+				scrupload.checkTypes(self, file);
+				
+				//size check
+				scrupload.checkSize(self, file);
 				
 				if(file.upload)
 				{
@@ -745,7 +807,7 @@ if(window.SWFUpload)
 			var self = this;	
 			
 			self.queue_array = [];
-			scrupload.buildDefaultPostParams(self.options);
+			scrupload.buildDefaultOptions(self.options);
 			
 			self._initInterface();
 		},/*
@@ -840,18 +902,10 @@ if(window.SWFUpload)
 					});
 					
 					//type check
-					if(self.options.types && !scrupload.checkTypes(self.options, file))
-					{
-						file.upload = false;
-						file.status = scrupload.FAILED;
-						self._trigger('onError', null, {
-							element: self.element,
-							file: file,
-							error: scrupload.ERROR_TYPE,
-							runtime: self.runtime,
-							options: self.options
-						});
-					}
+					scrupload.checkTypes(self, file);
+					
+					//size check
+					scrupload.checkSize(self, file);
 					
 					if(file.upload !== false)
 					{

@@ -11,7 +11,7 @@ $.widget('ui.scruploadHttp', {
 		self.element.addClass("scr_http_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'http', object: self.input};
@@ -36,7 +36,8 @@ $.widget('ui.scruploadHttp', {
 		button.click(function(){
 			var form = $('<form action="'+self.options.url+'" method="post" />'),
 			filename = 'n/a',
-			button = $(this)
+			button = $(this),
+			value = self.input.val()
 			;
 		
 			self.element.addClass("scr_uploading");
@@ -47,12 +48,25 @@ $.widget('ui.scruploadHttp', {
 				.appendTo(self.element)
 				.append(self.container);
 			
-			if(filename_regex.exec(self.input.val()))
+			if(filename_regex.exec(value))
 			{
 				filename = RegExp.$1;
 			}
 			
-			scrupload.submitIframForm(form, filename, self);
+			scrupload.submitIframForm(form, filename, self, function(file){
+				if(file.upload !== false && !value.match(/^https?:\/\//))
+				{
+					file.upload = false;
+					file.status = scrupload.FAILED;
+					self._trigger('onError', null, {
+						element: self.element,
+						file: file,
+						error: scrupload.ERROR_HTTP,
+						runtime: self.runtime,
+						options: self.options
+					});
+				}
+			});
 			
 			return false;
 		});

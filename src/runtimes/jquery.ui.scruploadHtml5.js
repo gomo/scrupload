@@ -10,7 +10,7 @@ $.widget('ui.scruploadHtml5', {
 		self.element.addClass("scr_html5_container");
 		
 		self.queue_array = [];
-		scrupload.buildDefaultPostParams(self.options);
+		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
 		self.runtime = {name: 'html5', object: self.input};
@@ -96,18 +96,10 @@ $.widget('ui.scruploadHtml5', {
 				});
 				
 				//type check
-				if(self.options.types && !scrupload.checkTypes(self.options, file))
-				{
-					file.upload = false;
-					file.status = scrupload.FAILED;
-					self._trigger('onError', null, {
-						element: self.element,
-						file: file,
-						error: scrupload.ERROR_TYPE,
-						runtime: self.runtime,
-						options: self.options
-					});
-				}
+				scrupload.checkTypes(self, file);
+				
+				//size check
+				scrupload.checkSize(self, file);
 				
 				if(file.upload)
 				{

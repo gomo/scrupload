@@ -23,7 +23,7 @@
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "8MB",
+				size_limit: "1MB",
 				types: "jpg|jpeg|gif|png|bmp",
 				onInit: function(event, ui)
 				{
@@ -204,7 +204,7 @@
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "8MB",
+				size_limit: "1MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
 				swfupload: {

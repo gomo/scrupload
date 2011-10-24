@@ -14,7 +14,7 @@ if(window.SWFUpload)
 			var self = this;	
 			
 			self.queue_array = [];
-			scrupload.buildDefaultPostParams(self.options);
+			scrupload.buildDefaultOptions(self.options);
 			
 			self._initInterface();
 		},/*
@@ -109,18 +109,10 @@ if(window.SWFUpload)
 					});
 					
 					//type check
-					if(self.options.types && !scrupload.checkTypes(self.options, file))
-					{
-						file.upload = false;
-						file.status = scrupload.FAILED;
-						self._trigger('onError', null, {
-							element: self.element,
-							file: file,
-							error: scrupload.ERROR_TYPE,
-							runtime: self.runtime,
-							options: self.options
-						});
-					}
+					scrupload.checkTypes(self, file);
+					
+					//size check
+					scrupload.checkSize(self, file);
 					
 					if(file.upload !== false)
 					{
