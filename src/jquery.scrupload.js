@@ -232,21 +232,32 @@ scr.detectFileType = function(file)
 	return type.toLowerCase();
 };
 
-scr.submitIframForm = function(form, filename, widget, after_select){
+scr.onSelect = function(widget, file)
+{
+	if(file.upload !== false)
+	{
+		var ret = widget._trigger('onSelect', null, {
+			element: widget.element,
+			runtime: widget.runtime,
+			file: file,
+			options: widget.options
+		});
+		
+		if(ret === false)
+		{
+			file.upload = false;
+		}
+	}
+};
+
+scr.submitIframForm = function(form, filename, widget, func){
 	var self = widget,
 		file
 		;
 	
 	file = scrupload.createFile({name: filename}, self.options);
 	
-	file.upload = self._trigger('onSelect', null, {
-		element: self.element,
-		runtime: self.runtime,
-		file: file,
-		options: self.options
-	});
-	
-	(after_select||$.noop)(file);
+	(func||$.noop)(file);
 	
 	//file typeのチェック
 	if(filename != 'n/a')
@@ -256,6 +267,8 @@ scr.submitIframForm = function(form, filename, widget, after_select){
 	
 	//size check
 	//html4/httpはサイズのチェックは出来ません
+	
+	scrupload.onSelect(self, file);
 	
 	self._trigger('onStart', null, {
 		element: self.element,

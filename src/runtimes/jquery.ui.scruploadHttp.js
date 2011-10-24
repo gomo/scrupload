@@ -54,6 +54,9 @@ $.widget('ui.scruploadHttp', {
 			}
 			
 			scrupload.submitIframForm(form, filename, self, function(file){
+				
+				file.http = {uri: value};
+				
 				if(file.upload !== false && !value.match(/^https?:\/\//))
 				{
 					file.upload = false;

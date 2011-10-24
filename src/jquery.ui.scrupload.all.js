@@ -6,7 +6,7 @@ if(g.scrupload )
 }
 	
 var scr = g.scrupload = g.scrupload||{},
-	uid_count = 0;
+	file_count = 0;
 ;
 
 scr.SELECTED = 1;
@@ -28,7 +28,7 @@ scr.uniqid = function(prefix)
 		uid += Math.floor(Math.random() * 65535).toString(32);
 	}
 
-	return (prefix || 's') + uid + (uid_count++).toString(32);
+	return ('scrupload-'+ uid).toString(32);
 };
 
 scr.buildUrlQuery = function(url, params)
@@ -198,7 +198,7 @@ scr.initButtonEvent = function(widget, element){
 scr.createFile = function(file, options){
 	
 	return {
-		id : this.uniqid(options.file_id_prefix),
+		id : (options.file_id_prefix||'scrupload-file-'+(++file_count)),
 		time: new Date(),
 		filename: file.name||file.fileName,
 		size: file.size,
@@ -232,21 +232,32 @@ scr.detectFileType = function(file)
 	return type.toLowerCase();
 };
 
-scr.submitIframForm = function(form, filename, widget, after_select){
+scr.onSelect = function(widget, file)
+{
+	if(file.upload !== false)
+	{
+		var ret = widget._trigger('onSelect', null, {
+			element: widget.element,
+			runtime: widget.runtime,
+			file: file,
+			options: widget.options
+		});
+		
+		if(ret === false)
+		{
+			file.upload = false;
+		}
+	}
+};
+
+scr.submitIframForm = function(form, filename, widget, func){
 	var self = widget,
 		file
 		;
 	
 	file = scrupload.createFile({name: filename}, self.options);
 	
-	file.upload = self._trigger('onSelect', null, {
-		element: self.element,
-		runtime: self.runtime,
-		file: file,
-		options: self.options
-	});
-	
-	(after_select||$.noop)(file);
+	(func||$.noop)(file);
 	
 	//file typeのチェック
 	if(filename != 'n/a')
@@ -256,6 +267,8 @@ scr.submitIframForm = function(form, filename, widget, after_select){
 	
 	//size check
 	//html4/httpはサイズのチェックは出来ません
+	
+	scrupload.onSelect(self, file);
 	
 	self._trigger('onStart', null, {
 		element: self.element,
@@ -449,6 +462,9 @@ $.widget('ui.scruploadHttp', {
 			}
 			
 			scrupload.submitIframForm(form, filename, self, function(file){
+				
+				file.http = {uri: value};
+				
 				if(file.upload !== false && !value.match(/^https?:\/\//))
 				{
 					file.upload = false;
@@ -643,7 +659,7 @@ $.widget('ui.scruploadHtml5', {
 				//postデータの作成
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
-				
+				fd.append('id', file.id);
 				for(var key in file.post)
 				{
 					fd.append(key, file.post[key]);
@@ -658,20 +674,15 @@ $.widget('ui.scruploadHtml5', {
 					uri: url
 				};
 				
-				file.upload = self._trigger('onSelect', null, {
-					element: self.element,
-					runtime: self.runtime,
-					file: file,
-					options: self.options
-				});
-				
 				//type check
 				scrupload.checkTypes(self, file);
 				
 				//size check
 				scrupload.checkSize(self, file);
 				
-				if(file.upload)
+				scrupload.onSelect(self, file);
+				
+				if(file.upload !== false)
 				{
 					self.queue_array.push(file);
 				}
@@ -894,18 +905,13 @@ if(window.SWFUpload)
 					selected = true;
 					file.swfupload = {file: swf_file};
 					
-					file.upload = self._trigger('onSelect', null, {
-						element: self.element,
-						runtime: self.runtime,
-						file: file,
-						options: self.options
-					});
-					
 					//type check
 					scrupload.checkTypes(self, file);
 					
 					//size check
 					scrupload.checkSize(self, file);
+					
+					scrupload.onSelect(self, file);
 					
 					if(file.upload !== false)
 					{

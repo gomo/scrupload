@@ -88,20 +88,15 @@ $.widget('ui.scruploadHtml5', {
 					uri: url
 				};
 				
-				file.upload = self._trigger('onSelect', null, {
-					element: self.element,
-					runtime: self.runtime,
-					file: file,
-					options: self.options
-				});
-				
 				//type check
 				scrupload.checkTypes(self, file);
 				
 				//size check
 				scrupload.checkSize(self, file);
 				
-				if(file.upload)
+				scrupload.onSelect(self, file);
+				
+				if(file.upload !== false)
 				{
 					self.queue_array.push(file);
 				}

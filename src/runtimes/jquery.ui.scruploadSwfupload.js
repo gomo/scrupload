@@ -101,18 +101,13 @@ if(window.SWFUpload)
 					selected = true;
 					file.swfupload = {file: swf_file};
 					
-					file.upload = self._trigger('onSelect', null, {
-						element: self.element,
-						runtime: self.runtime,
-						file: file,
-						options: self.options
-					});
-					
 					//type check
 					scrupload.checkTypes(self, file);
 					
 					//size check
 					scrupload.checkSize(self, file);
+					
+					scrupload.onSelect(self, file);
 					
 					if(file.upload !== false)
 					{
