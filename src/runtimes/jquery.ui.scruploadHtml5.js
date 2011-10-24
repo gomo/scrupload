@@ -73,7 +73,7 @@ $.widget('ui.scruploadHtml5', {
 				//postデータの作成
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
-				
+				fd.append('id', file.id);
 				for(var key in file.post)
 				{
 					fd.append(key, file.post[key]);

@@ -6,7 +6,7 @@ if(g.scrupload )
 }
 	
 var scr = g.scrupload = g.scrupload||{},
-	uid_count = 0;
+	file_count = 0;
 ;
 
 scr.SELECTED = 1;
@@ -28,7 +28,7 @@ scr.uniqid = function(prefix)
 		uid += Math.floor(Math.random() * 65535).toString(32);
 	}
 
-	return (prefix || 's') + uid + (uid_count++).toString(32);
+	return ('scrupload-'+ uid).toString(32);
 };
 
 scr.buildUrlQuery = function(url, params)
@@ -198,7 +198,7 @@ scr.initButtonEvent = function(widget, element){
 scr.createFile = function(file, options){
 	
 	return {
-		id : this.uniqid(options.file_id_prefix),
+		id : (options.file_id_prefix||'scrupload-file-'+(++file_count)),
 		time: new Date(),
 		filename: file.name||file.fileName,
 		size: file.size,
