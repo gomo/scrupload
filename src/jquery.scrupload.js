@@ -16,7 +16,7 @@ scr.DONE = 4;
 
 scr.ERROR_TYPE = 10;
 scr.ERROR_SIZE_LIMIT = 11;
-scr.ERROR_QUEUE_LIMIT = 12;
+//scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function(prefix)
 {
@@ -87,18 +87,10 @@ scr.buildDefaultPostParams = function(options){
  * @param filename
  * @returns {Boolean}
  */
-scr.checkTypes = function(types, filename){
+scr.checkTypes = function(options, file){
 	
-	var list = types.split("|"), i;
-	for(i=0; i<list.length; i++)
-	{
-		if(filename.toLowerCase().lastIndexOf(list[i].toLowerCase()) == filename.length - list[i].length)
-		{
-			return true;
-		}
-	}
-	
-	return false;
+	var list = options.types.split("|"), i;
+	return $.inArray(file.type, list) != -1;
 };
 
 scr.defaultOptions = function(options){
@@ -141,12 +133,14 @@ scr.initButtonEvent = function(widget, element){
 	});
 };
 
-scr.createFile = function(filename, options){
+scr.createFile = function(file, options){
 	
 	return {
 		id : this.uniqid(options.file_id_prefix),
 		time: new Date(),
-		filename: filename,
+		filename: file.name||file.fileName,
+		size: file.size,
+		type: scr.detectFileType(file),
 		status: this.SELECTED,
 		user: {},
 		get: $.extend({}, options.get_params),
@@ -154,31 +148,34 @@ scr.createFile = function(filename, options){
 	};
 };
 
+scr.detectFileType = function(file)
+{
+	var type;
+	if(file.type)
+	{
+		if(file.type.indexOf('/') == -1)
+		{
+			type = file.type.substr(1);
+		}
+	}
+
+	if(!type)
+	{
+		var name = file.name||file.fileName;
+		type = name.substr(name.lastIndexOf('.') + 1);
+	}
+	
+	
+	
+	return type.toLowerCase();
+};
+
 scr.submitIframForm = function(form, filename, widget){
 	var self = widget,
 		file
 		;
 	
-	file = scrupload.createFile(filename, self.options);
-	
-	//file typeのチェック
-	if(self.options.types && filename != 'n/a')
-	{
-		if(!scrupload.checkTypes(self.options.types, filename))
-		{
-			file.status = scrupload.FAILED;
-			self._trigger('onError', null, {
-				element: self.element,
-				file: file,
-				error: scrupload.ERROR_TYPE,
-				runtime: self.runtime,
-				options: self.options
-			});
-			self._resetInterface();
-			
-			return;
-		}
-	}
+	file = scrupload.createFile({name: filename}, self.options);
 	
 	file.upload = self._trigger('onSelect', null, {
 		element: self.element,
@@ -187,15 +184,32 @@ scr.submitIframForm = function(form, filename, widget){
 		options: self.options
 	});
 	
+	//file typeのチェック
+	if(self.options.types && filename != 'n/a')
+	{
+		if(!scrupload.checkTypes(self.options, file))
+		{
+			file.upload = false;
+			file.status = scrupload.FAILED;
+			self._trigger('onError', null, {
+				element: self.element,
+				file: file,
+				error: scrupload.ERROR_TYPE,
+				runtime: self.runtime,
+				options: self.options
+			});
+		}
+	}
+	
+	self._trigger('onStart', null, {
+		element: self.element,
+		runtime: self.runtime,
+		files: file.upload !==  false ? [file] : [],
+		options: self.options
+	});
+	
 	if(file.upload !== false)
 	{
-		self._trigger('onStart', null, {
-			element: self.element,
-			runtime: self.runtime,
-			files: [file],
-			options: self.options
-		});
-		
 		self._trigger('onFileStart', null, {
 			element: self.element,
 			runtime: self.runtime,

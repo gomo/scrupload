@@ -96,7 +96,7 @@ if(window.SWFUpload)
 					selected = false;
 				},
 				file_queued_handler: function(swf_file){
-					var file = scrupload.createFile(swf_file.name, self.options);
+					var file = scrupload.createFile(swf_file, self.options);
 					
 					selected = true;
 					file.swfupload = {file: swf_file};
@@ -107,6 +107,20 @@ if(window.SWFUpload)
 						file: file,
 						options: self.options
 					});
+					
+					//type check
+					if(self.options.types && !scrupload.checkTypes(self.options, file))
+					{
+						file.upload = false;
+						file.status = scrupload.FAILED;
+						self._trigger('onError', null, {
+							element: self.element,
+							file: file,
+							error: scrupload.ERROR_TYPE,
+							runtime: self.runtime,
+							options: self.options
+						});
+					}
 					
 					if(file.upload !== false)
 					{
@@ -122,14 +136,15 @@ if(window.SWFUpload)
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					
+					self._trigger('onStart', null, {
+						element: self.element,
+						runtime: self.runtime,
+						files: self.queue_array,
+						options: self.options
+					});
+					
 					if(self.queue_array.length > 0)
 					{
-						self._trigger('onStart', null, {
-							element: self.element,
-							runtime: self.runtime,
-							files: self.queue_array,
-							options: self.options
-						});
 						scrupload.disableInterface(self.element, self.options);
 						
 						this.startUpload();
@@ -206,7 +221,7 @@ if(window.SWFUpload)
 					uploaded = [];
 					files = {};
 					current_file = null;
-				},
+				}/*,
 				file_queue_error_handler:function(file, code, message){
 					self._trigger('onError', null, {
 						element: self.element,
@@ -216,7 +231,7 @@ if(window.SWFUpload)
 						options: self.options
 					});
 					
-				}
+				}*/
 			});
 			
 			if(!self.options.mutiple_select)

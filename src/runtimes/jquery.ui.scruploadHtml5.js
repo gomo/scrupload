@@ -67,7 +67,7 @@ $.widget('ui.scruploadHtml5', {
 			
 			for(var i=0; i<this.files.length; i++)
 			{
-				file = scrupload.createFile(this.files[i].name||this.files[i].fileName, self.options);
+				file = scrupload.createFile(this.files[i], self.options);
 				
 				
 				//postデータの作成
@@ -94,6 +94,20 @@ $.widget('ui.scruploadHtml5', {
 					file: file,
 					options: self.options
 				});
+				
+				//type check
+				if(self.options.types && !scrupload.checkTypes(self.options, file))
+				{
+					file.upload = false;
+					file.status = scrupload.FAILED;
+					self._trigger('onError', null, {
+						element: self.element,
+						file: file,
+						error: scrupload.ERROR_TYPE,
+						runtime: self.runtime,
+						options: self.options
+					});
+				}
 				
 				if(file.upload)
 				{

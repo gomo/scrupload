@@ -16,7 +16,7 @@ scr.DONE = 4;
 
 scr.ERROR_TYPE = 10;
 scr.ERROR_SIZE_LIMIT = 11;
-scr.ERROR_QUEUE_LIMIT = 12;
+//scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function(prefix)
 {
@@ -87,18 +87,10 @@ scr.buildDefaultPostParams = function(options){
  * @param filename
  * @returns {Boolean}
  */
-scr.checkTypes = function(types, filename){
+scr.checkTypes = function(options, file){
 	
-	var list = types.split("|"), i;
-	for(i=0; i<list.length; i++)
-	{
-		if(filename.toLowerCase().lastIndexOf(list[i].toLowerCase()) == filename.length - list[i].length)
-		{
-			return true;
-		}
-	}
-	
-	return false;
+	var list = options.types.split("|"), i;
+	return $.inArray(file.type, list) != -1;
 };
 
 scr.defaultOptions = function(options){
@@ -141,12 +133,14 @@ scr.initButtonEvent = function(widget, element){
 	});
 };
 
-scr.createFile = function(filename, options){
+scr.createFile = function(file, options){
 	
 	return {
 		id : this.uniqid(options.file_id_prefix),
 		time: new Date(),
-		filename: filename,
+		filename: file.name||file.fileName,
+		size: file.size,
+		type: scr.detectFileType(file),
 		status: this.SELECTED,
 		user: {},
 		get: $.extend({}, options.get_params),
@@ -154,31 +148,34 @@ scr.createFile = function(filename, options){
 	};
 };
 
+scr.detectFileType = function(file)
+{
+	var type;
+	if(file.type)
+	{
+		if(file.type.indexOf('/') == -1)
+		{
+			type = file.type.substr(1);
+		}
+	}
+
+	if(!type)
+	{
+		var name = file.name||file.fileName;
+		type = name.substr(name.lastIndexOf('.') + 1);
+	}
+	
+	
+	
+	return type.toLowerCase();
+};
+
 scr.submitIframForm = function(form, filename, widget){
 	var self = widget,
 		file
 		;
 	
-	file = scrupload.createFile(filename, self.options);
-	
-	//file typeのチェック
-	if(self.options.types && filename != 'n/a')
-	{
-		if(!scrupload.checkTypes(self.options.types, filename))
-		{
-			file.status = scrupload.FAILED;
-			self._trigger('onError', null, {
-				element: self.element,
-				file: file,
-				error: scrupload.ERROR_TYPE,
-				runtime: self.runtime,
-				options: self.options
-			});
-			self._resetInterface();
-			
-			return;
-		}
-	}
+	file = scrupload.createFile({name: filename}, self.options);
 	
 	file.upload = self._trigger('onSelect', null, {
 		element: self.element,
@@ -187,15 +184,32 @@ scr.submitIframForm = function(form, filename, widget){
 		options: self.options
 	});
 	
+	//file typeのチェック
+	if(self.options.types && filename != 'n/a')
+	{
+		if(!scrupload.checkTypes(self.options, file))
+		{
+			file.upload = false;
+			file.status = scrupload.FAILED;
+			self._trigger('onError', null, {
+				element: self.element,
+				file: file,
+				error: scrupload.ERROR_TYPE,
+				runtime: self.runtime,
+				options: self.options
+			});
+		}
+	}
+	
+	self._trigger('onStart', null, {
+		element: self.element,
+		runtime: self.runtime,
+		files: file.upload !==  false ? [file] : [],
+		options: self.options
+	});
+	
 	if(file.upload !== false)
 	{
-		self._trigger('onStart', null, {
-			element: self.element,
-			runtime: self.runtime,
-			files: [file],
-			options: self.options
-		});
-		
 		self._trigger('onFileStart', null, {
 			element: self.element,
 			runtime: self.runtime,
@@ -553,7 +567,7 @@ $.widget('ui.scruploadHtml5', {
 			
 			for(var i=0; i<this.files.length; i++)
 			{
-				file = scrupload.createFile(this.files[i].name||this.files[i].fileName, self.options);
+				file = scrupload.createFile(this.files[i], self.options);
 				
 				
 				//postデータの作成
@@ -580,6 +594,20 @@ $.widget('ui.scruploadHtml5', {
 					file: file,
 					options: self.options
 				});
+				
+				//type check
+				if(self.options.types && !scrupload.checkTypes(self.options, file))
+				{
+					file.upload = false;
+					file.status = scrupload.FAILED;
+					self._trigger('onError', null, {
+						element: self.element,
+						file: file,
+						error: scrupload.ERROR_TYPE,
+						runtime: self.runtime,
+						options: self.options
+					});
+				}
 				
 				if(file.upload)
 				{
@@ -665,7 +693,7 @@ $.widget('ui.scruploadHtml5', {
 			else
 			{
 				next = self.queue_array.shift();
-				self._onFileStart(next)
+				self._onFileStart(next);
 				setTimeout(function(){
 					self._upload(next, uploaded);
 				}, self.options.interval);
@@ -799,7 +827,7 @@ if(window.SWFUpload)
 					selected = false;
 				},
 				file_queued_handler: function(swf_file){
-					var file = scrupload.createFile(swf_file.name, self.options);
+					var file = scrupload.createFile(swf_file, self.options);
 					
 					selected = true;
 					file.swfupload = {file: swf_file};
@@ -810,6 +838,20 @@ if(window.SWFUpload)
 						file: file,
 						options: self.options
 					});
+					
+					//type check
+					if(self.options.types && !scrupload.checkTypes(self.options, file))
+					{
+						file.upload = false;
+						file.status = scrupload.FAILED;
+						self._trigger('onError', null, {
+							element: self.element,
+							file: file,
+							error: scrupload.ERROR_TYPE,
+							runtime: self.runtime,
+							options: self.options
+						});
+					}
 					
 					if(file.upload !== false)
 					{
@@ -825,14 +867,15 @@ if(window.SWFUpload)
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					
+					self._trigger('onStart', null, {
+						element: self.element,
+						runtime: self.runtime,
+						files: self.queue_array,
+						options: self.options
+					});
+					
 					if(self.queue_array.length > 0)
 					{
-						self._trigger('onStart', null, {
-							element: self.element,
-							runtime: self.runtime,
-							files: self.queue_array,
-							options: self.options
-						});
 						scrupload.disableInterface(self.element, self.options);
 						
 						this.startUpload();
@@ -909,7 +952,7 @@ if(window.SWFUpload)
 					uploaded = [];
 					files = {};
 					current_file = null;
-				},
+				}/*,
 				file_queue_error_handler:function(file, code, message){
 					self._trigger('onError', null, {
 						element: self.element,
@@ -919,7 +962,7 @@ if(window.SWFUpload)
 						options: self.options
 					});
 					
-				}
+				}*/
 			});
 			
 			if(!self.options.mutiple_select)
