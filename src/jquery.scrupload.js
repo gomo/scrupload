@@ -112,20 +112,13 @@ scr.buildDefaultOptions = function(options){
  */
 scr.checkTypes = function(widget, file)
 {
-	if(file.upload !== false && widget.options.types)
+	if(widget.options.types)
 	{
 		var list = widget.options.types.split("|"), i;
 		if($.inArray(file.type, list) == -1)
 		{
-			file.upload = false;
+			file.errors.push({type:scrupload.ERROR_TYPE});
 			file.status = scrupload.FAILED;
-			widget._trigger('onError', null, {
-				element: widget.element,
-				file: file,
-				error: scrupload.ERROR_TYPE,
-				runtime: widget.runtime,
-				options: widget.options
-			});
 		}
 	}
 };
@@ -137,19 +130,12 @@ scr.checkTypes = function(widget, file)
  */
 scr.checkSize = function(widget, file)
 {
-	if(file.upload !== false && widget.options.size_limit && file.size)
+	if(widget.options.size_limit && file.size)
 	{
 		if(file.size > widget.options.size_limit)
 		{
-			file.upload = false;
+			file.errors.push({type:scrupload.ERROR_SIZE});
 			file.status = scrupload.FAILED;
-			widget._trigger('onError', null, {
-				element: widget.element,
-				file: file,
-				error: scrupload.ERROR_SIZE,
-				runtime: widget.runtime,
-				options: widget.options
-			});
 		}
 	}
 };
@@ -204,7 +190,7 @@ scr.createFile = function(file, options){
 		size: file.size,
 		type: scr.detectFileType(file),
 		status: this.SELECTED,
-		user: {},
+		errors: [],
 		get: $.extend({}, options.get_params),
 		post: $.extend({}, options.post_params)
 	};
@@ -234,19 +220,21 @@ scr.detectFileType = function(file)
 
 scr.onSelect = function(widget, file)
 {
-	if(file.upload !== false)
+	widget._trigger('onSelect', null, {
+		element: widget.element,
+		runtime: widget.runtime,
+		file: file,
+		options: widget.options
+	});
+	
+	if(file.errors.length > 0)
 	{
-		var ret = widget._trigger('onSelect', null, {
+		widget._trigger('onError', null, {
 			element: widget.element,
-			runtime: widget.runtime,
 			file: file,
+			runtime: widget.runtime,
 			options: widget.options
 		});
-		
-		if(ret === false)
-		{
-			file.upload = false;
-		}
 	}
 };
 
@@ -273,11 +261,11 @@ scr.submitIframForm = function(form, filename, widget, func){
 	self._trigger('onStart', null, {
 		element: self.element,
 		runtime: self.runtime,
-		files: file.upload !==  false ? [file] : [],
+		files: file.errors.length === 0 ? [file] : [],
 		options: self.options
 	});
 	
-	if(file.upload !== false)
+	if(file.errors.length == 0)
 	{
 		self._trigger('onFileStart', null, {
 			element: self.element,

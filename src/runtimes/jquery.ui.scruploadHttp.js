@@ -57,17 +57,10 @@ $.widget('ui.scruploadHttp', {
 				
 				file.http = {uri: value};
 				
-				if(file.upload !== false && !value.match(/^https?:\/\//))
+				if(!value.match(/^https?:\/\//))
 				{
-					file.upload = false;
+					file.errors.push({type:scrupload.ERROR_HTTP});
 					file.status = scrupload.FAILED;
-					self._trigger('onError', null, {
-						element: self.element,
-						file: file,
-						error: scrupload.ERROR_HTTP,
-						runtime: self.runtime,
-						options: self.options
-					});
 				}
 			});
 			

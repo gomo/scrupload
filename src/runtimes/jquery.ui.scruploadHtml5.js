@@ -96,7 +96,7 @@ $.widget('ui.scruploadHtml5', {
 				
 				scrupload.onSelect(self, file);
 				
-				if(file.upload !== false)
+				if(file.errors.length == 0)
 				{
 					self.queue_array.push(file);
 				}

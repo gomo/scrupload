@@ -109,7 +109,7 @@ if(window.SWFUpload)
 					
 					scrupload.onSelect(self, file);
 					
-					if(file.upload !== false)
+					if(file.errors.length == 0)
 					{
 						self.queue_array.push(file);
 						files[swf_file.id] = file;
@@ -119,7 +119,7 @@ if(window.SWFUpload)
 						this.cancelUpload(swf_file.id);
 					}
 					
-					return file.upload;
+					//return file.upload;
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					
