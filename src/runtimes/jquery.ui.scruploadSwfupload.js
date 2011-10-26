@@ -14,28 +14,16 @@ if(window.SWFUpload)
 			var self = this;	
 			
 			self.queue_array = [];
+			self.uploaded_array = [];
+			self.selected_array = [];
 			scrupload.buildDefaultOptions(self.options);
 			
 			self._initInterface();
-		},/*
-		_loadCookie: function()
-		{
-			var tmp_cookie,tmp_keyval,i;
-			
-			this._cookie = {};
-			
-			tmp_cookie = document.cookie.split('; ');
-			for(i=0; i<tmp_cookie.length; i++)
-			{
-				tmp_keyval = tmp_cookie[i].split('=');
-				this._cookie[tmp_keyval[0]] = unescape(tmp_keyval[1]);
-			}
-		},*/
+		},
 		_initInterface: function()
 		{
 			var self = this,
 				files = {},
-				uploaded = [],
 				setting,
 				cookie_post = {},
 				cookie_get = {},
@@ -77,7 +65,6 @@ if(window.SWFUpload)
 			
 			self.swfuploader = null;
 			setting = $.extend(self.options.swfupload, {
-				//file_upload_limit: self.options.upload_limit||0,
 				file_post_name: self.options.file_post_name,
 				upload_url: self.options.url,
 				file_size_limit: self.options.size_limit,
@@ -101,32 +88,43 @@ if(window.SWFUpload)
 					selected = true;
 					file.swfupload = {file: swf_file};
 					
+					files[swf_file.id] = file;
+					
 					//type check
 					scrupload.checkTypes(self, file);
 					
 					//size check
 					scrupload.checkSize(self, file);
 					
-					scrupload.onSelect(self, file);
-					
-					if(file.errors.length == 0)
-					{
-						self.queue_array.push(file);
-						files[swf_file.id] = file;
-					}
-					else
-					{
-						this.cancelUpload(swf_file.id);
-					}
-					
-					//return file.upload;
+					self.selected_array.push(file);
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					
-					self._trigger('onStart', null, {
+					self._trigger('onDialogClose', null, {
 						element: self.element,
 						runtime: self.runtime,
-						files: self.queue_array,
+						selected: self.selected_array,
+						options: self.options
+					});
+					
+					$.each(self.selected_array, function(){
+						var file = this;
+						scrupload.onSelect(self, file);
+						
+						if(file.errors.length == 0)
+						{
+							self.queue_array.push(file);
+						}
+						else
+						{
+							self.swfuploader.cancelUpload(file.swfupload.file.id);
+						}
+					})
+					
+					self._trigger('onStartUpload', null, {
+						element: self.element,
+						runtime: self.runtime,
+						queue: self.queue_array,
 						options: self.options
 					});
 					
@@ -138,7 +136,7 @@ if(window.SWFUpload)
 					}
 					else if(selected)
 					{
-						self._onComplete(uploaded);
+						self._onComplete();
 					}
 				},
 				upload_start_handler: function(swf_file){
@@ -148,7 +146,7 @@ if(window.SWFUpload)
 					;
 					
 					//interval
-					if(uploaded.length > 0)
+					if(self.uploaded_array.length > 0)
 					{
 						
 						if(current_file != file)
@@ -192,7 +190,7 @@ if(window.SWFUpload)
 				upload_success_handler: function(swf_file, resp){
 					var file = files[swf_file.id];
 					file.status = scrupload.DONE;
-					uploaded.push(file);
+					self.uploaded_array.push(file);
 					self._trigger('onFileComplete', null, {
 						element: self.element,
 						runtime: self.runtime,
@@ -202,23 +200,14 @@ if(window.SWFUpload)
 					});
 				},
 				queue_complete_handler: function(num_uploaded){
-					self._onComplete(uploaded);
+					self._onComplete();
 					
 					scrupload.enableInterface(self.element, self.options);
-					uploaded = [];
+					self.uploaded_array = [];
+					self.selected_array = [];
 					files = {};
 					current_file = null;
-				}/*,
-				file_queue_error_handler:function(file, code, message){
-					self._trigger('onError', null, {
-						element: self.element,
-						file: null,
-						error: scrupload.ERROR_QUEUE_LIMIT,
-						runtime: self.runtime,
-						options: self.options
-					});
-					
-				}*/
+				}
 			});
 			
 			if(!self.options.mutiple_select)
@@ -230,12 +219,12 @@ if(window.SWFUpload)
 			
 			self.swfuploader = new SWFUpload(setting);
 		},
-		_onComplete: function(uploaded)
+		_onComplete: function()
 		{
 			this._trigger('onComplete', null, {
 				element: this.element,
 				runtime: this.runtime,
-				uploaded: uploaded,
+				uploaded: self.uploaded_array,
 				options: this.options
 			});
 		},

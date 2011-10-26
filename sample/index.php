@@ -29,6 +29,10 @@
 				{
 					display(ui.element, 'init', ui);
 				},
+				onDialogClose: function(event, ui)
+				{
+					display(ui.element, 'onDialogClose', ui);
+				},
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
@@ -39,9 +43,9 @@
 
 					++count.html5;
 				},
-				onStart: function(event, ui)
+				onStartUpload: function(event, ui)
 				{
-					display(ui.element, 'start', ui.files);
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -90,6 +94,10 @@
 				{
 					display(ui.element, 'init', ui);
 				},
+				onDialogClose: function(event, ui)
+				{
+					display(ui.element, 'onDialogClose', ui);
+				},
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
@@ -100,9 +108,9 @@
 
 					++count.http;
 				},
-				onStart: function(event, ui)
+				onStartUpload: function(event, ui)
 				{
-					display(ui.element, 'start', ui.files);
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -150,6 +158,10 @@
 				{
 					display(ui.element, 'init', ui);
 				},
+				onDialogClose: function(event, ui)
+				{
+					display(ui.element, 'onDialogClose', ui);
+				},
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
@@ -160,9 +172,9 @@
 
 					++count.html4;
 				},
-				onStart: function(event, ui)
+				onStartUpload: function(event, ui)
 				{
-					display(ui.element, 'start', ui.files);
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -219,6 +231,10 @@
 				{
 					display(ui.element, 'init', ui);
 				},
+				onDialogClose: function(event, ui)
+				{
+					display(ui.element, 'onDialogClose', ui);
+				},
 				onSelect: function(event, ui)
 				{
 					display(ui.element, 'select', ui);
@@ -229,9 +245,9 @@
 
 					++count.swf;
 				},
-				onStart: function(event, ui)
+				onStartUpload: function(event, ui)
 				{
-					display(ui.element, 'start', ui.files);
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -295,9 +311,9 @@
 				{
 					display(ui.element, 'select', ui);
 				},
-				onStart: function(event, ui)
+				onStartUpload: function(event, ui)
 				{
-					display(ui.element, 'start', ui.files);
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{

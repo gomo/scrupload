@@ -256,12 +256,19 @@ scr.submitIframForm = function(form, filename, widget, func){
 	//size check
 	//html4/httpはサイズのチェックは出来ません
 	
-	scrupload.onSelect(self, file);
-	
-	self._trigger('onStart', null, {
+	self._trigger('onDialogClose', null, {
 		element: self.element,
 		runtime: self.runtime,
-		files: file.errors.length === 0 ? [file] : [],
+		selected: [file],
+		options: self.options
+	});
+	
+	scrupload.onSelect(self, file);
+	
+	self._trigger('onStartUpload', null, {
+		element: self.element,
+		runtime: self.runtime,
+		queue: file.errors.length === 0 ? [file] : [],
 		options: self.options
 	});
 	

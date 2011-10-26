@@ -8,8 +8,8 @@ $.widget('ui.scruploadHtml5', {
 		var self = this;
 		
 		self.element.addClass("scr_html5_container");
-		
 		self.queue_array = [];
+		
 		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
@@ -23,6 +23,9 @@ $.widget('ui.scruploadHtml5', {
 	_initInterface: function()
 	{
 		var self = this;
+		
+		self.selected_array = [];
+		self.uploaded_array = [];
 		self._createFormAndInput();		
 	},
 	_createFormAndInput: function()
@@ -50,7 +53,6 @@ $.widget('ui.scruploadHtml5', {
 				filename = 'n/a',
 				result,
 				input = $(this),
-				uploaded = [],
 				file,
 				next
 				;
@@ -94,18 +96,30 @@ $.widget('ui.scruploadHtml5', {
 				//size check
 				scrupload.checkSize(self, file);
 				
+				self.selected_array.push(file);
+			}
+			
+			self._trigger('onDialogClose', null, {
+				element: self.element,
+				runtime: self.runtime,
+				selected: self.selected_array,
+				options: self.options
+			});
+			
+			$.each(self.selected_array, function(){
+				var file = this;
 				scrupload.onSelect(self, file);
 				
 				if(file.errors.length == 0)
 				{
 					self.queue_array.push(file);
 				}
-			}
+			});
 			
-			self._trigger('onStart', null, {
+			self._trigger('onStartUpload', null, {
 				element: self.element,
 				runtime: self.runtime,
-				files: self.queue_array,
+				queue: self.queue_array,
 				options: self.options
 			});
 			
@@ -113,19 +127,19 @@ $.widget('ui.scruploadHtml5', {
 			if(next)
 			{
 				self._onFileStart(next);
-				self._upload(next, uploaded);
+				self._upload(next);
 			}
 			else
 			{
-				self._onComplete(uploaded);
+				self._onComplete();
 			}
 		});
 	},
-	_upload: function(file, uploaded)
+	_upload: function(file)
 	{
 		var xhr = new XMLHttpRequest();
 		
-		this._setAjaxEventListener(xhr, file, uploaded);
+		this._setAjaxEventListener(xhr, file);
 		
 		xhr.open("POST", file.html5.uri);
 		xhr.send(file.html5.formData);
@@ -139,7 +153,7 @@ $.widget('ui.scruploadHtml5', {
 			options: this.options
 		});
 	},
-	_setAjaxEventListener: function(xhr, file, uploaded)
+	_setAjaxEventListener: function(xhr, file)
 	{
 		var self = this;
 		xhr.upload.addEventListener("progress", function(event){
@@ -171,28 +185,28 @@ $.widget('ui.scruploadHtml5', {
 				options: self.options
 			});
 			
-			uploaded.push(file);
+			self.uploaded_array.push(file);
 			
 			if(self.queue_array.length == 0)
 			{
-				self._onComplete(uploaded);
+				self._onComplete();
 			}
 			else
 			{
 				next = self.queue_array.shift();
 				self._onFileStart(next);
 				setTimeout(function(){
-					self._upload(next, uploaded);
+					self._upload(next);
 				}, self.options.interval);
 			}
 		}, false);
 	},
-	_onComplete: function(uploaded)
+	_onComplete: function()
 	{
 		this._trigger('onComplete', null, {
 			element: this.element,
 			runtime: this.runtime,
-			uploaded: uploaded,
+			uploaded: self.uploaded_array,
 			options: this.options
 		});
 		

@@ -112,20 +112,13 @@ scr.buildDefaultOptions = function(options){
  */
 scr.checkTypes = function(widget, file)
 {
-	if(file.upload !== false && widget.options.types)
+	if(widget.options.types)
 	{
 		var list = widget.options.types.split("|"), i;
 		if($.inArray(file.type, list) == -1)
 		{
-			file.upload = false;
+			file.errors.push({type:scrupload.ERROR_TYPE});
 			file.status = scrupload.FAILED;
-			widget._trigger('onError', null, {
-				element: widget.element,
-				file: file,
-				error: scrupload.ERROR_TYPE,
-				runtime: widget.runtime,
-				options: widget.options
-			});
 		}
 	}
 };
@@ -137,19 +130,12 @@ scr.checkTypes = function(widget, file)
  */
 scr.checkSize = function(widget, file)
 {
-	if(file.upload !== false && widget.options.size_limit && file.size)
+	if(widget.options.size_limit && file.size)
 	{
 		if(file.size > widget.options.size_limit)
 		{
-			file.upload = false;
+			file.errors.push({type:scrupload.ERROR_SIZE});
 			file.status = scrupload.FAILED;
-			widget._trigger('onError', null, {
-				element: widget.element,
-				file: file,
-				error: scrupload.ERROR_SIZE,
-				runtime: widget.runtime,
-				options: widget.options
-			});
 		}
 	}
 };
@@ -204,7 +190,7 @@ scr.createFile = function(file, options){
 		size: file.size,
 		type: scr.detectFileType(file),
 		status: this.SELECTED,
-		user: {},
+		errors: [],
 		get: $.extend({}, options.get_params),
 		post: $.extend({}, options.post_params)
 	};
@@ -234,19 +220,21 @@ scr.detectFileType = function(file)
 
 scr.onSelect = function(widget, file)
 {
-	if(file.upload !== false)
+	widget._trigger('onSelect', null, {
+		element: widget.element,
+		runtime: widget.runtime,
+		file: file,
+		options: widget.options
+	});
+	
+	if(file.errors.length > 0)
 	{
-		var ret = widget._trigger('onSelect', null, {
+		widget._trigger('onError', null, {
 			element: widget.element,
-			runtime: widget.runtime,
 			file: file,
+			runtime: widget.runtime,
 			options: widget.options
 		});
-		
-		if(ret === false)
-		{
-			file.upload = false;
-		}
 	}
 };
 
@@ -268,16 +256,23 @@ scr.submitIframForm = function(form, filename, widget, func){
 	//size check
 	//html4/httpはサイズのチェックは出来ません
 	
-	scrupload.onSelect(self, file);
-	
-	self._trigger('onStart', null, {
+	self._trigger('onDialogClose', null, {
 		element: self.element,
 		runtime: self.runtime,
-		files: file.upload !==  false ? [file] : [],
+		selected: [file],
 		options: self.options
 	});
 	
-	if(file.upload !== false)
+	scrupload.onSelect(self, file);
+	
+	self._trigger('onStartUpload', null, {
+		element: self.element,
+		runtime: self.runtime,
+		queue: file.errors.length === 0 ? [file] : [],
+		options: self.options
+	});
+	
+	if(file.errors.length == 0)
 	{
 		self._trigger('onFileStart', null, {
 			element: self.element,
@@ -465,17 +460,10 @@ $.widget('ui.scruploadHttp', {
 				
 				file.http = {uri: value};
 				
-				if(file.upload !== false && !value.match(/^https?:\/\//))
+				if(!value.match(/^https?:\/\//))
 				{
-					file.upload = false;
+					file.errors.push({type:scrupload.ERROR_HTTP});
 					file.status = scrupload.FAILED;
-					self._trigger('onError', null, {
-						element: self.element,
-						file: file,
-						error: scrupload.ERROR_HTTP,
-						runtime: self.runtime,
-						options: self.options
-					});
 				}
 			});
 			
@@ -594,8 +582,8 @@ $.widget('ui.scruploadHtml5', {
 		var self = this;
 		
 		self.element.addClass("scr_html5_container");
-		
 		self.queue_array = [];
+		
 		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
@@ -609,6 +597,9 @@ $.widget('ui.scruploadHtml5', {
 	_initInterface: function()
 	{
 		var self = this;
+		
+		self.selected_array = [];
+		self.uploaded_array = [];
 		self._createFormAndInput();		
 	},
 	_createFormAndInput: function()
@@ -636,7 +627,6 @@ $.widget('ui.scruploadHtml5', {
 				filename = 'n/a',
 				result,
 				input = $(this),
-				uploaded = [],
 				file,
 				next
 				;
@@ -680,18 +670,30 @@ $.widget('ui.scruploadHtml5', {
 				//size check
 				scrupload.checkSize(self, file);
 				
+				self.selected_array.push(file);
+			}
+			
+			self._trigger('onDialogClose', null, {
+				element: self.element,
+				runtime: self.runtime,
+				selected: self.selected_array,
+				options: self.options
+			});
+			
+			$.each(self.selected_array, function(){
+				var file = this;
 				scrupload.onSelect(self, file);
 				
-				if(file.upload !== false)
+				if(file.errors.length == 0)
 				{
 					self.queue_array.push(file);
 				}
-			}
+			});
 			
-			self._trigger('onStart', null, {
+			self._trigger('onStartUpload', null, {
 				element: self.element,
 				runtime: self.runtime,
-				files: self.queue_array,
+				queue: self.queue_array,
 				options: self.options
 			});
 			
@@ -699,19 +701,19 @@ $.widget('ui.scruploadHtml5', {
 			if(next)
 			{
 				self._onFileStart(next);
-				self._upload(next, uploaded);
+				self._upload(next);
 			}
 			else
 			{
-				self._onComplete(uploaded);
+				self._onComplete();
 			}
 		});
 	},
-	_upload: function(file, uploaded)
+	_upload: function(file)
 	{
 		var xhr = new XMLHttpRequest();
 		
-		this._setAjaxEventListener(xhr, file, uploaded);
+		this._setAjaxEventListener(xhr, file);
 		
 		xhr.open("POST", file.html5.uri);
 		xhr.send(file.html5.formData);
@@ -725,7 +727,7 @@ $.widget('ui.scruploadHtml5', {
 			options: this.options
 		});
 	},
-	_setAjaxEventListener: function(xhr, file, uploaded)
+	_setAjaxEventListener: function(xhr, file)
 	{
 		var self = this;
 		xhr.upload.addEventListener("progress", function(event){
@@ -757,28 +759,28 @@ $.widget('ui.scruploadHtml5', {
 				options: self.options
 			});
 			
-			uploaded.push(file);
+			self.uploaded_array.push(file);
 			
 			if(self.queue_array.length == 0)
 			{
-				self._onComplete(uploaded);
+				self._onComplete();
 			}
 			else
 			{
 				next = self.queue_array.shift();
 				self._onFileStart(next);
 				setTimeout(function(){
-					self._upload(next, uploaded);
+					self._upload(next);
 				}, self.options.interval);
 			}
 		}, false);
 	},
-	_onComplete: function(uploaded)
+	_onComplete: function()
 	{
 		this._trigger('onComplete', null, {
 			element: this.element,
 			runtime: this.runtime,
-			uploaded: uploaded,
+			uploaded: self.uploaded_array,
 			options: this.options
 		});
 		
@@ -818,28 +820,16 @@ if(window.SWFUpload)
 			var self = this;	
 			
 			self.queue_array = [];
+			self.uploaded_array = [];
+			self.selected_array = [];
 			scrupload.buildDefaultOptions(self.options);
 			
 			self._initInterface();
-		},/*
-		_loadCookie: function()
-		{
-			var tmp_cookie,tmp_keyval,i;
-			
-			this._cookie = {};
-			
-			tmp_cookie = document.cookie.split('; ');
-			for(i=0; i<tmp_cookie.length; i++)
-			{
-				tmp_keyval = tmp_cookie[i].split('=');
-				this._cookie[tmp_keyval[0]] = unescape(tmp_keyval[1]);
-			}
-		},*/
+		},
 		_initInterface: function()
 		{
 			var self = this,
 				files = {},
-				uploaded = [],
 				setting,
 				cookie_post = {},
 				cookie_get = {},
@@ -881,7 +871,6 @@ if(window.SWFUpload)
 			
 			self.swfuploader = null;
 			setting = $.extend(self.options.swfupload, {
-				//file_upload_limit: self.options.upload_limit||0,
 				file_post_name: self.options.file_post_name,
 				upload_url: self.options.url,
 				file_size_limit: self.options.size_limit,
@@ -905,32 +894,43 @@ if(window.SWFUpload)
 					selected = true;
 					file.swfupload = {file: swf_file};
 					
+					files[swf_file.id] = file;
+					
 					//type check
 					scrupload.checkTypes(self, file);
 					
 					//size check
 					scrupload.checkSize(self, file);
 					
-					scrupload.onSelect(self, file);
-					
-					if(file.upload !== false)
-					{
-						self.queue_array.push(file);
-						files[swf_file.id] = file;
-					}
-					else
-					{
-						this.cancelUpload(swf_file.id);
-					}
-					
-					return file.upload;
+					self.selected_array.push(file);
 				},
 				file_dialog_complete_handler: function(num_selected, num_queued){
 					
-					self._trigger('onStart', null, {
+					self._trigger('onDialogClose', null, {
 						element: self.element,
 						runtime: self.runtime,
-						files: self.queue_array,
+						selected: self.selected_array,
+						options: self.options
+					});
+					
+					$.each(self.selected_array, function(){
+						var file = this;
+						scrupload.onSelect(self, file);
+						
+						if(file.errors.length == 0)
+						{
+							self.queue_array.push(file);
+						}
+						else
+						{
+							self.swfuploader.cancelUpload(file.swfupload.file.id);
+						}
+					})
+					
+					self._trigger('onStartUpload', null, {
+						element: self.element,
+						runtime: self.runtime,
+						queue: self.queue_array,
 						options: self.options
 					});
 					
@@ -942,7 +942,7 @@ if(window.SWFUpload)
 					}
 					else if(selected)
 					{
-						self._onComplete(uploaded);
+						self._onComplete();
 					}
 				},
 				upload_start_handler: function(swf_file){
@@ -952,7 +952,7 @@ if(window.SWFUpload)
 					;
 					
 					//interval
-					if(uploaded.length > 0)
+					if(self.uploaded_array.length > 0)
 					{
 						
 						if(current_file != file)
@@ -996,7 +996,7 @@ if(window.SWFUpload)
 				upload_success_handler: function(swf_file, resp){
 					var file = files[swf_file.id];
 					file.status = scrupload.DONE;
-					uploaded.push(file);
+					self.uploaded_array.push(file);
 					self._trigger('onFileComplete', null, {
 						element: self.element,
 						runtime: self.runtime,
@@ -1006,23 +1006,14 @@ if(window.SWFUpload)
 					});
 				},
 				queue_complete_handler: function(num_uploaded){
-					self._onComplete(uploaded);
+					self._onComplete();
 					
 					scrupload.enableInterface(self.element, self.options);
-					uploaded = [];
+					self.uploaded_array = [];
+					self.selected_array = [];
 					files = {};
 					current_file = null;
-				}/*,
-				file_queue_error_handler:function(file, code, message){
-					self._trigger('onError', null, {
-						element: self.element,
-						file: null,
-						error: scrupload.ERROR_QUEUE_LIMIT,
-						runtime: self.runtime,
-						options: self.options
-					});
-					
-				}*/
+				}
 			});
 			
 			if(!self.options.mutiple_select)
@@ -1034,12 +1025,12 @@ if(window.SWFUpload)
 			
 			self.swfuploader = new SWFUpload(setting);
 		},
-		_onComplete: function(uploaded)
+		_onComplete: function()
 		{
 			this._trigger('onComplete', null, {
 				element: this.element,
 				runtime: this.runtime,
-				uploaded: uploaded,
+				uploaded: self.uploaded_array,
 				options: this.options
 			});
 		},
