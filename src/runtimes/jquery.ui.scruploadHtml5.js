@@ -76,6 +76,7 @@ $.widget('ui.scruploadHtml5', {
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
 				fd.append('id', file.id);
+				fd.append('post_name', input_name);
 				for(var key in file.post)
 				{
 					fd.append(key, file.post[key]);

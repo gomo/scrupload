@@ -152,8 +152,7 @@
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "8MB",
-				types: "jpg|jpeg|gif|png|bmp",
+				size_limit: "1MB",
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);

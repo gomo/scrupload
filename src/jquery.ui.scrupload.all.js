@@ -75,13 +75,7 @@ scr.buildDefaultOptions = function(options){
 		options.post_params.types = options.types;
 	}
 	
-	
-	if(options.size_limit)
-	{
-		options.post_params.size_limit = options.size_limit;
-	}
-	
-	//size_limitをバイトにする
+	//size_limitをバイトにするしてpostにセット
 	if(options.size_limit)
 	{
 		var limit = options.size_limit;
@@ -102,6 +96,8 @@ scr.buildDefaultOptions = function(options){
 		{
 			throw options.size_limit+' is illegal size_limit value.';
 		}
+		
+		options.post_params.size_limit = options.size_limit;
 	}
 };
 
@@ -112,7 +108,7 @@ scr.buildDefaultOptions = function(options){
  */
 scr.checkTypes = function(widget, file)
 {
-	if(widget.options.types)
+	if(widget.options.types && file.type)
 	{
 		var list = widget.options.types.split("|"), i;
 		if($.inArray(file.type, list) == -1)
@@ -198,24 +194,32 @@ scr.createFile = function(file, options){
 
 scr.detectFileType = function(file)
 {
-	var type;
+	var type, name, i;
 	if(file.type)
 	{
 		if(file.type.indexOf('/') == -1)
 		{
-			type = file.type.substr(1);
+			type = file.type.substr(1).toLowerCase();
 		}
 	}
 
 	if(!type)
 	{
-		var name = file.name||file.fileName;
-		type = name.substr(name.lastIndexOf('.') + 1);
+		name = file.name||file.fileName;
+		i = name.lastIndexOf('.');
+		if(i == -1)
+		{
+			type = false;
+		}
+		else
+		{
+			type = name.substr(i + 1).toLowerCase();
+		}
 	}
 	
 	
 	
-	return type.toLowerCase();
+	return type;
 };
 
 scr.onSelect = function(widget, file)
@@ -284,6 +288,7 @@ scr.submitIframForm = function(form, filename, widget, func){
 		form.submit(function(){
 			//post params
 			file.post.id = file.id;
+			file.post.post_name = self.options.file_post_name;
 			$.each(file.post, function(key){
 				form.append('<input type="hidden" name="'+key+'" value="'+this+'" />');
 			});
@@ -402,7 +407,7 @@ scr.enableInterface = function(element, options){
 
 })(jQuery, (function(){ return this; })());
 (function($){
-var filename_regex = new RegExp("([^/]+)$");
+var filename_regex = new RegExp("([^/?]+)\\??[^/]*$");
 $.widget('ui.scruploadHttp', {
 	options: scrupload.defaultOptions({
 		button_value: 'OK'
@@ -456,8 +461,11 @@ $.widget('ui.scruploadHttp', {
 				filename = RegExp.$1;
 			}
 			
+			
+			
 			scrupload.submitIframForm(form, filename, self, function(file){
 				
+				file.post.filename = filename;
 				file.http = {uri: value};
 				
 				if(!value.match(/^https?:\/\//))
@@ -650,6 +658,7 @@ $.widget('ui.scruploadHtml5', {
 				fd = new FormData();
 				fd.append(input_name, this.files[i]);
 				fd.append('id', file.id);
+				fd.append('post_name', input_name);
 				for(var key in file.post)
 				{
 					fd.append(key, file.post[key]);
@@ -1041,6 +1050,7 @@ if(window.SWFUpload)
 			
 			//post
 			file.post.id = file.id;
+			file.post.post_name = this.options.file_post_name;
 			
 			this.swfuploader.setPostParams($.extend(cookie_post, file.post));
 			

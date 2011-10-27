@@ -235,6 +235,7 @@ if(window.SWFUpload)
 			
 			//post
 			file.post.id = file.id;
+			file.post.post_name = this.options.file_post_name;
 			
 			this.swfuploader.setPostParams($.extend(cookie_post, file.post));
 			
