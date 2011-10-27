@@ -1,5 +1,5 @@
 (function($){
-var filename_regex = new RegExp("([^/]+)$");
+var filename_regex = new RegExp("([^/?]+)\\??[^/]*$");
 $.widget('ui.scruploadHttp', {
 	options: scrupload.defaultOptions({
 		button_value: 'OK'
@@ -53,8 +53,11 @@ $.widget('ui.scruploadHttp', {
 				filename = RegExp.$1;
 			}
 			
+			
+			
 			scrupload.submitIframForm(form, filename, self, function(file){
 				
+				file.post.filename = filename;
 				file.http = {uri: value};
 				
 				if(!value.match(/^https?:\/\//))
