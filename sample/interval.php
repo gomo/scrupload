@@ -23,17 +23,17 @@
 				interval: 1000,
 				onInit: function(event, ui)
 				{
-					//display(ui.element, 'init', ui);
+					display(ui.element, 'init', ui);
 				},
 				onSelect: function(event, ui)
 				{
-					/*++count;
+					++count;
 					if(count > limit)
 					{
 						return false;
-					}*/
+					}
 					
-					//display(ui.element, 'select', ui);
+					display(ui.element, 'select', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -41,7 +41,7 @@
 				},
 				onProgress: function(event, ui)
 				{
-					//display(ui.element, 'progress', ui);
+					display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
@@ -49,15 +49,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					//display(ui.element, 'button over', ui);
+					display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					//display(ui.element, 'button down', ui);
+					display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					//display(ui.element, 'button out', ui);
+					display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -65,7 +65,7 @@
 				},
 				onError: function(event, ui)
 				{
-					//display(ui.element, 'error', ui);
+					display(ui.element, 'error', ui);
 				}
 			});
 
@@ -94,13 +94,13 @@
 				},
 				onSelect: function(event, ui)
 				{
-					/*++count;
+					++count;
 
 					if(count > limit)
 					{
 						return false;
-					}*/
-					//display(ui.element, 'select', ui);
+					}
+					display(ui.element, 'select', ui);
 				},
 				onFileStart: function(event, ui)
 				{
@@ -108,7 +108,7 @@
 				},
 				onProgress: function(event, ui)
 				{
-					//display(ui.element, 'progress', ui);
+					display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
@@ -116,15 +116,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					//display(ui.element, 'button over', ui);
+					display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					//display(ui.element, 'button down', ui);
+					display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					//display(ui.element, 'button out', ui);
+					display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
