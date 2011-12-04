@@ -70,7 +70,7 @@ if(window.SWFUpload)
 				file_size_limit: self.options.size_limit,
 				button_placeholder_id: scrupload.generateElementId(self.swf_container.find("div")),
 				preserve_relative_urls: true,
-				button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+				//button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
 				swfupload_loaded_handler: function(){
 					self.runtime = {name: "swfupload", object:self.swfuploader};
 					self._trigger('onInit', null, {
@@ -218,6 +218,7 @@ if(window.SWFUpload)
 			scrupload.initButtonEvent(self, self.swf_container);
 			
 			self.swfuploader = new SWFUpload(setting);
+			
 		},
 		_onComplete: function()
 		{
