@@ -45,8 +45,9 @@ $.widget('ui.scruploadHttp', {
 			self.input.attr('name', self.options.file_post_name);
 			
 			form
-				.appendTo(self.element)
-				.append(self.container);
+				.appendTo($("body"))
+				.append(self.container)
+				.hide();
 			
 			if(filename_regex.exec(value))
 			{

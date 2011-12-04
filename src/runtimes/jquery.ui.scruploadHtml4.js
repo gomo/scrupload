@@ -46,8 +46,9 @@ $.widget('ui.scruploadHtml4', {
 			input.attr('name', self.options.file_post_name);
 			
 			form
-				.appendTo(self.element)
-				.append(self.container);
+				.appendTo($("body"))
+				.append(self.container)
+				.hide();
 			
 			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
 			
