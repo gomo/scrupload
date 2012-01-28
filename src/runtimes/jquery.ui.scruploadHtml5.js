@@ -42,9 +42,10 @@ $.widget('ui.scruploadHtml5', {
 			self.input = $('<input type="file" name="'+input_name+'" />');
 		}
 		
-		
 		self.container = $("<span />");
-		self.input.appendTo(self.container.appendTo(self.element));
+		self.container.appendTo(self.element);
+		self.input.appendTo(self.container);
+		
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
@@ -177,16 +178,35 @@ $.widget('ui.scruploadHtml5', {
 		xhr.addEventListener("load", function(event){
 			var next;
 			
-			file.status = scrupload.DONE;
-			self._trigger('onFileComplete', null, {
-				element: self.element,
-				runtime: self.runtime,
-				file: file,
-				response: event.target.responseText,
-				options: self.options
-			});
+			var resp_json;
+			try{ resp_json = $.parseJSON(event.target.responseText); }catch(err){};
 			
-			self.uploaded_array.push(file);
+			if(resp_json && resp_json.errors.length)
+			{
+				file.status = scrupload.FAILED;
+				file.errors = resp_json.errors;
+				self._trigger('onError', null, {
+					element: self.element,
+					file: file,
+					runtime: self.runtime,
+					options: self.options
+				});
+			}
+			else
+			{
+				file.status = scrupload.DONE;
+				self._trigger('onFileComplete', null, {
+					element: self.element,
+					runtime: self.runtime,
+					file: file,
+					response: event.target.responseText,
+					json: resp_json,
+					options: self.options
+				});
+				
+				self.uploaded_array.push(file);
+			}
+			
 			
 			if(self.queue_array.length == 0)
 			{
@@ -216,6 +236,7 @@ $.widget('ui.scruploadHtml5', {
 	_resetInterface:function()
 	{
 		this.container.remove();
+		
 		this._initInterface();
 	},
 	destroy: function()

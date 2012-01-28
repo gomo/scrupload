@@ -17,6 +17,7 @@ scr.DONE = 4;
 scr.ERROR_TYPE = 'TYPE';
 scr.ERROR_CAPACITY = 'CAPACITY';
 scr.ERROR_HTTP = 'HTTP';
+scr.ERROR_USER = 'USER';
 //scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function(prefix)
@@ -82,15 +83,15 @@ scr.buildDefaultOptions = function(options){
 		var result;
 		if(result = limit.match(/^([0-9]+)MB$/i))
 		{
-			options.size_limit = result[1] * 1024 * 1024;
+			options.size_limit_byte = result[1] * 1024 * 1024;
 		}
 		else if(result = limit.match(/^([0-9]+)KB$/i))
 		{
-			options.size_limit = result[1] * 1024;
+			options.size_limit_byte = result[1] * 1024;
 		}
 		else if(result = limit.match(/^([0-9]+)B?$/i))
 		{
-			options.size_limit = result[1];
+			options.size_limit_byte = result[1];
 		}
 		else
 		{
@@ -98,6 +99,7 @@ scr.buildDefaultOptions = function(options){
 		}
 		
 		options.post_params.size_limit = options.size_limit;
+		options.post_params.size_limit_byte = options.size_limit_byte;
 	}
 };
 
@@ -113,7 +115,10 @@ scr.checkTypes = function(widget, file)
 		var list = widget.options.types.split("|"), i;
 		if($.inArray(file.type, list) == -1)
 		{
-			file.errors.push({type:scrupload.ERROR_TYPE});
+			file.errors.push({
+				type:scrupload.ERROR_TYPE,
+				params: {file_types: list.join(",")}
+			});
 			file.status = scrupload.FAILED;
 		}
 	}
@@ -126,11 +131,16 @@ scr.checkTypes = function(widget, file)
  */
 scr.checkSize = function(widget, file)
 {
-	if(widget.options.size_limit && file.size)
+	if(widget.options.size_limit_byte && file.size)
 	{
-		if(file.size > widget.options.size_limit)
+		if(file.size > widget.options.size_limit_byte)
 		{
-			file.errors.push({type:scrupload.ERROR_CAPACITY});
+			file.errors.push({
+				type:scrupload.ERROR_CAPACITY,
+				params:{
+					capacity: widget.options.size_limit
+				}
+			});
 			file.status = scrupload.FAILED;
 		}
 	}

@@ -13,11 +13,10 @@
 		$(function(){
 			$("#button_html5").scruploadHtml5({
 				url: '/scrupload/sample/upload.php',
-				post_params: {hoge: 123},
+				post_params: {error_trigger: 1},
 				get_params:{huga: 456},
-				size_limit: "8MB",
+				size_limit: "100MB",
 				types: "jpg|jpeg|gif|png|bmp",
-				interval: 1000,
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
@@ -62,40 +61,33 @@
 
 
 
+			
 
-			/*$("#button_swfuplod").scruploadSwfupload({
+
+			$("#button_html4").scruploadHtml4({
 				url: '/scrupload/sample/upload.php',
-				post_params: {hoge: 123},
+				post_params: {error_trigger: 1},
 				get_params:{huga: 456},
-				size_limit: "8MB",
-				types: "jpg|gif|png|bmp",
-				mutiple_select: true,
-				interval: 1000,
-				swfupload: {
-					cookie: ['PHPSESSID'],
-					cookie_method: 'post',
-					button_image_url: '/img/upload_splite.gif',
-					button_width: 148,
-					button_height: 60,
-					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
-				},
+				size_limit: "100MB",
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
 				},
+				onDialogClose: function(event, ui)
+				{
+					display(ui.element, 'onDialogClose', ui);
+				},
 				onSelect: function(event, ui)
 				{
-					++count;
-
-					if(count > limit)
-					{
-						return false;
-					}
 					display(ui.element, 'select', ui);
+				},
+				onStartUpload: function(event, ui)
+				{
+					display(ui.element, 'start_upload', ui);
 				},
 				onFileStart: function(event, ui)
 				{
-					display(ui.element, 'filestart', ui);
+					display(ui.element, 'file_start', ui);
 				},
 				onProgress: function(event, ui)
 				{
@@ -125,9 +117,7 @@
 				{
 					display(ui.element, 'error', ui);
 				}
-			});*/
-
-
+			});
 
 		
 
@@ -204,10 +194,21 @@
 <div>
 <h1>html5</h1>
 <div id="button_html5"></div>
-<a href="javascript:void(0)" onclick="$('#button_html5').scruploadHtml5('destroy')">destroy</a>
+<a href="javascript:void(0);" onclick="$('#button_html5').scruploadHtml5('destroy')">destroy</a>
 <div class="display"></div>
 </div>
 
+
+<div>
+<h1>html4</h1>
+<div id="button_html4"></div>
+<a href="javascript:void(0);" onclick="$('#button_html4').scruploadHtml4('destroy')">destroy</a>
+<div class="display"></div>
+</div>
+
+<div style="height: 3000px">
+&nbsp;
+</div>
 
 </body>
 </html>

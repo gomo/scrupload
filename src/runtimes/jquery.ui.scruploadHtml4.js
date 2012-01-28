@@ -68,6 +68,7 @@ $.widget('ui.scruploadHtml4', {
 	_resetInterface:function()
 	{
 		this.container.remove();
+		
 		this._initInterface();
 	},
 	destroy: function()

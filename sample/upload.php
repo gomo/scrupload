@@ -17,5 +17,13 @@ $file->save();
 $file->set('GET', $_GET);
 $file->set('POST', $_POST);
 
+if(isset($_POST['error_trigger']))
+{
+	$file->addError(Scrupload_File::ERROR_SYSTEM, 'Some error has happend!');
+	
+	$e = new Scrupload_UploadException("IMAGE_SIZE", null, array('width' => 200, 'height' => 200));
+	$file->addErrorFromException($e);
+}
+
 
 echo json_encode($file->toArray());

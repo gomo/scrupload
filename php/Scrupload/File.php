@@ -8,22 +8,30 @@ class Scrupload_UploadException extends Exception
 {
 	private $_type;
 	
-	public function __construct($type, $message = '')
+	private $_params;
+	
+	public function __construct($type, $message = '', array $params = array())
 	{
 		parent::__construct($message);
 		$this->_type = $type;
+		$this->_params = $params;
 	}
 	
 	public function getType()
 	{
 		return $this->_type;
 	}
+	
+	public function getParams()
+	{
+		return $this->_params;
+	}
 }
 
 class Scrupload_File
 {
 	const ERROR_SYSTEM = 'SYSTEM';
-	const ERROR_SIZE = 'SIZE';
+	const ERROR_CAPACITY = 'CAPACITY';
 	const ERROR_TYPE = 'TYPE';
 	
 	public static $MIME_TYPE_EXTENSION = array(
@@ -49,7 +57,7 @@ class Scrupload_File
 	
 	/**
 	 * 
-	 * @param string $dir �ۑ���f�B���N�g��
+	 * @param string $dir 保存先ディレクトリ
 	 */
 	public function __construct($dir)
 	{
@@ -65,7 +73,7 @@ class Scrupload_File
 			
 			$post_name = $this->_getPostParam('post_name');
 			
-			//$_FILES�̃A�b�v���[�h
+			//$_FILESのアップロード
 			if(isset($_FILES[$post_name]))
 			{
 				$file = $_FILES[$post_name];
@@ -75,7 +83,7 @@ class Scrupload_File
 				$this->_values['filename'] = $file['name'];
 				$this->_size = $file['size'];
 			}
-			//HTTP�̃A�b�v���[�h
+			//HTTPのアップロード
 			else if($http = $this->_getPostParam($post_name))
 			{
 				$this->_values['path'] = $this->_save($http, $dir);
@@ -89,11 +97,11 @@ class Scrupload_File
 		}
 		catch(Scrupload_UploadException $e)
 		{
-			$this->addError($e->getType(), $e->getMessage());
+			$this->addErrorFromException($e);
 		}
 		catch(Exception $e)
 		{
-			//�����͗��Ȃ�����
+			//ここは来ないかも
 			$this->addError(self::ERROR_SYSTEM, $e->getMessage());
 		}
 	}
@@ -136,12 +144,12 @@ class Scrupload_File
 	
 	private function _checkSize()
 	{
-		$size = $this->_getPostParam('size_limit');
+		$size = $this->_getPostParam('size_limit_byte');
 		if($size !== null)
 		{
 			if($this->_size > $size)
 			{
-				throw new Scrupload_UploadException(self::ERROR_SIZE);
+				throw new Scrupload_UploadException(self::ERROR_CAPACITY, null, array('capacity' => $this->_getPostParam('size_limit')));
 			}
 		}
 	}
@@ -158,26 +166,26 @@ class Scrupload_File
 			switch ($file['error'])
 			{
 				case UPLOAD_ERR_INI_SIZE:
-					throw new Scrupload_UploadException(self::ERROR_SIZE, 'PHP_INI_SIZE');
+					throw new Scrupload_UploadException(self::ERROR_CAPACITY, 'PHP_INI_SIZE');
 					break;
 				case UPLOAD_ERR_FORM_SIZE:
-					throw new Scrupload_UploadException(self::ERROR_SIZE, 'HTML_FORM_SIZE');
+					throw new Scrupload_UploadException(self::ERROR_CAPACITY, 'HTML_FORM_SIZE');
 					break;
 				default:
 					throw new Scrupload_UploadException(self::ERROR_SYSTEM, 'HTTP POST error '.$file['error']);
 			}
 		}
 		
-		//�g���q���t�@�C��������擾
+		//拡張子をファイル名から取得
 		$ext = $this->_getExtFromFilename($file['name']);
 		if(!$ext)
 		{
-			//�_����������mimetype
+			//ダメだったらmimetype
 			$ext = $this->_getExtFromMime($file['tmp_name']);
 		}
 		$this->_extension = $ext;
 		
-		//�t�@�C�������擾
+		//ファイル名を取得
 		$dest = $this->_generateFilename($dir, $ext);
 		
 		$res = @move_uploaded_file($file['tmp_name'], $dest);
@@ -199,7 +207,7 @@ class Scrupload_File
 			throw new Scrupload_UploadException(self::ERROR_SYSTEM, 'Failed to load url '.$http);
 		}
 		
-		//�g���qmime_type���擾����̂ɁAhttp�A�N�Z�X���������Ȃ��̂ň�U�ۑ�
+		//拡張子mime_typeを取得するのに、httpアクセスをしたくないので一旦保存
 		$dest = $this->_generateFilename($dir, '');
 		$res = file_put_contents($dest, $file);
 		$file = null;
@@ -209,11 +217,11 @@ class Scrupload_File
 			throw new Scrupload_UploadException(self::ERROR_SYSTEM, 'Failed to save file to '.$dest);
 		}
 		
-		//�g���q���t�@�C��������擾
+		//拡張子をファイル名から取得
 		$ext = $this->_getExtFromFilename($this->_getPostParam('filename'));
 		if(!$ext)
 		{
-			//�_����������mimetype
+			//ダメだったらmimetype
 			$ext = $this->_getExtFromMime($dest);
 		}
 		
@@ -275,7 +283,7 @@ class Scrupload_File
 			$dir .= '/';
 		}
 		
-		//�e���|�����摜�t�@�C�����𐶐�����i�ő�5��܂Ŏ��s����j
+		//テンポラリ画像ファイル名を生成する（最大5回まで試行する）
 		for($i = 0; $i < 5; ++$i)
 		{
 			$tmp_filename = $dir.$this->_generateRandomId();
@@ -287,7 +295,7 @@ class Scrupload_File
 			$fp = @fopen($web_dir . $tmp_filename, 'x');
 			if ($fp)
 			{
-				//�쐬�ɐ��������ꍇ�͍��͎g���Ă��Ȃ��t�@�C�����Ȃ̂ŏ��������s�ł���
+				//作成に成功した場合は今は使われていないファイル名なので処理が続行できる
 				fclose($fp);
 				return $tmp_filename;
 			}
@@ -299,12 +307,12 @@ class Scrupload_File
 	private function _generateRandomId()
 	{
 		list($msec, $sec) = explode(' ', microtime());
-		//�b + 0.��������}�C�N���b + ������16�i���\�L���ĘA��
+		//秒 + 0.を削ったマイクロ秒 + 乱数を16進数表記して連結
 		return sprintf('%08x%08x%08x', intval($sec), intval(substr($msec, 2)), mt_rand());
 	}
 	
 	/**
-	 * �ۑ���A�t�@�C���̃f�[�^��z��Ŏ擾�B���X�|���X�p�B
+	 * 保存後、ファイルのデータを配列で取得。レスポンス用。
 	 * @return array
 	 */
 	public function toArray()
@@ -313,7 +321,7 @@ class Scrupload_File
 	}
 	
 	/**
-	 * ���X�|���X�p�̒l���L�[���w�肵�ĒP�ƂŎ擾
+	 * レスポンス用の値をキーを指定して単独で取得
 	 * @return mixed
 	 * @param string $name
 	 * @param mixed $default
@@ -353,12 +361,24 @@ class Scrupload_File
 	
 	/**
 	 * 
-	 * ���X�|���X�p�ɃG���[��ǉ�
+	 * Scrupload_UploadExceptionからレスポンス用エラーを追加。
+	 * 
+	 * @param Scrupload_UploadException $e
+	 */
+	public function addErrorFromException(Scrupload_UploadException $e)
+	{
+		$this->addError($e->getType(), $e->getMessage(), $e->getParams());
+		return $this;
+	}
+	
+	/**
+	 * 
+	 * レスポンス用エラーを追加
 	 * 
 	 * @param string $type
 	 * @param string $message
 	 */
-	public function addError($type, $message = null)
+	public function addError($type, $message = null, array $params = array())
 	{
 		$error = array('type' => strtoupper($type));
 		
@@ -367,13 +387,18 @@ class Scrupload_File
 			$error['message'] = $message;
 		}
 		
+		if($params)
+		{
+			$error['params'] = $params;
+		}
+		
 		$this->_values['errors'][] = $error;
 	}
 	
 	/**
 	 * 
-	 * ���X�|���X�p�̒l��ǉ��B
-	 * �������O����������㏑���܂�
+	 * レスポンス用の値を追加。
+	 * 同じ名前があったら上書きます
 	 * 
 	 * @param unknown_type $name
 	 * @param unknown_type $value

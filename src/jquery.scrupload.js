@@ -15,8 +15,9 @@ scr.FAILED = 3;
 scr.DONE = 4;
 
 scr.ERROR_TYPE = 'TYPE';
-scr.ERROR_SIZE = 'SIZE';
+scr.ERROR_CAPACITY = 'CAPACITY';
 scr.ERROR_HTTP = 'HTTP';
+scr.ERROR_USER = 'USER';
 //scr.ERROR_QUEUE_LIMIT = 12;
 
 scr.uniqid = function(prefix)
@@ -82,15 +83,15 @@ scr.buildDefaultOptions = function(options){
 		var result;
 		if(result = limit.match(/^([0-9]+)MB$/i))
 		{
-			options.size_limit = result[1] * 1024 * 1024;
+			options.size_limit_byte = result[1] * 1024 * 1024;
 		}
 		else if(result = limit.match(/^([0-9]+)KB$/i))
 		{
-			options.size_limit = result[1] * 1024;
+			options.size_limit_byte = result[1] * 1024;
 		}
 		else if(result = limit.match(/^([0-9]+)B?$/i))
 		{
-			options.size_limit = result[1];
+			options.size_limit_byte = result[1];
 		}
 		else
 		{
@@ -98,6 +99,7 @@ scr.buildDefaultOptions = function(options){
 		}
 		
 		options.post_params.size_limit = options.size_limit;
+		options.post_params.size_limit_byte = options.size_limit_byte;
 	}
 };
 
@@ -113,7 +115,10 @@ scr.checkTypes = function(widget, file)
 		var list = widget.options.types.split("|"), i;
 		if($.inArray(file.type, list) == -1)
 		{
-			file.errors.push({type:scrupload.ERROR_TYPE});
+			file.errors.push({
+				type:scrupload.ERROR_TYPE,
+				params: {file_types: list.join(",")}
+			});
 			file.status = scrupload.FAILED;
 		}
 	}
@@ -126,11 +131,16 @@ scr.checkTypes = function(widget, file)
  */
 scr.checkSize = function(widget, file)
 {
-	if(widget.options.size_limit && file.size)
+	if(widget.options.size_limit_byte && file.size)
 	{
-		if(file.size > widget.options.size_limit)
+		if(file.size > widget.options.size_limit_byte)
 		{
-			file.errors.push({type:scrupload.ERROR_SIZE});
+			file.errors.push({
+				type:scrupload.ERROR_CAPACITY,
+				params:{
+					capacity: widget.options.size_limit
+				}
+			});
 			file.status = scrupload.FAILED;
 		}
 	}
@@ -148,7 +158,8 @@ scr.defaultOptions = function(options)
 
 scr.initButtonEvent = function(widget, element){
 	var mouseover = false;
-	element.mouseout(function(){
+	
+	element.bind('mouseout.scr', function(){
 		if(mouseover)
 		{
 			widget._trigger('onButtonOut', null, {
@@ -158,7 +169,7 @@ scr.initButtonEvent = function(widget, element){
 			});
 			mouseover = false;
 		}
-	}).mouseover(function(){
+	}).bind('mouseover.scr', function(){
 		if(!mouseover)
 		{
 			widget._trigger('onButtonOver', null, {
@@ -168,13 +179,20 @@ scr.initButtonEvent = function(widget, element){
 			});
 			mouseover = true;
 		}
-	}).mousedown(function(){
+	}).bind('mousedown.scr', function(){
 		widget._trigger('onButtonDown', null, {
 			element: widget.element,
 			runtime: widget.runtime,
 			options: widget.options
 		});
 	});
+};
+
+scr.removeButtonEvent = function(element){
+	element
+		.unbind('mouseout.scr')
+		.unbind('mouseover.scr')
+		.unbind('mousedown.scr');
 };
 
 scr.createFile = function(file, options){
@@ -321,22 +339,40 @@ scr.submitIframForm = function(form, filename, widget, func){
 				
 				if (resp)
 				{
-					self._trigger('onProgress', null, {
-						element: self.element,
-						file: file,
-						runtime: self.runtime,
-						progress: {percent: 100},
-						options: self.options
-					});
+					var resp_json;
+					try{ resp_json = $.parseJSON(resp); }catch(err){};
 					
-					file.status = scrupload.DONE;
-					self._trigger('onFileComplete', null, {
-						element: self.element,
-						file: file,
-						runtime: self.runtime,
-						response: resp,
-						options: self.options
-					});
+					if(resp_json && resp_json.errors.length)
+					{
+						file.status = scr.FAILED;
+						file.errors = resp_json.errors;
+						self._trigger('onError', null, {
+							element: self.element,
+							file: file,
+							runtime: self.runtime,
+							options: self.options
+						});
+					}
+					else
+					{
+						self._trigger('onProgress', null, {
+							element: self.element,
+							file: file,
+							runtime: self.runtime,
+							progress: {percent: 100},
+							options: self.options
+						});
+						
+						file.status = scrupload.DONE;
+						self._trigger('onFileComplete', null, {
+							element: self.element,
+							file: file,
+							runtime: self.runtime,
+							response: resp,
+							json: resp_json,
+							options: self.options
+						});
+					}
 					
 					//html4は一個しかアップロードできないので同義
 					self._trigger('onComplete', null, {

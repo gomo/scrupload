@@ -2,13 +2,14 @@
 
 $.widget('ui.scrupload', {
 	options: {
-		runtimes:'swfupload|http|html4'
+		//runtimes:'swfupload|http|html4'
+		runtimes:'html5|html4'
 	},
 	_create: function()
 	{
-		this.isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
-		this.isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
-		this.isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
+		//this.isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
+		//this.isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
+		//this.isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
 		
 		var self = this,
 			runtimes,
@@ -21,7 +22,7 @@ $.widget('ui.scrupload', {
 		check_html5 = $('<input type="file" />').appendTo("body").hide();
 		runtimes = {
 			html5: !!check_html5[0].files,
-			swfupload: self.detectFlashVer(8, 0, 0) && window.SWFUpload,
+			//swfupload: self.detectFlashVer(8, 0, 0) && window.SWFUpload,
 			http: true,
 			html4: true
 		};
@@ -57,7 +58,7 @@ $.widget('ui.scrupload', {
 	{
 		return "scrupload"+runtime.substr(0, 1).toUpperCase()+runtime.substr(1);
 	},
-	detectFlashVer: function(reqMajorVer, reqMinorVer, reqRevision)
+	/*detectFlashVer: function(reqMajorVer, reqMinorVer, reqRevision)
 	{
 		var	versionStr = this._getFlashVesion(),
 			versionMajor,
@@ -232,7 +233,7 @@ $.widget('ui.scrupload', {
 		}
 		
 		return version;
-	},
+	}*/,
 	destroy: function()
 	{
 		this.element[this._getRuntimeName(this.current_runtime)]("destroy");

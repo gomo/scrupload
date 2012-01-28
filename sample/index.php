@@ -3,27 +3,27 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF8" />
 	<title>Scrapload</title>
-	<script type="text/javascript" src="/js/sdx/lib/jquery-1.4.4.min.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/jquery.cookie.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/jquery-ui-1.8.7.custom.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
-	<script type="text/javascript" src="/scrupload/src/jquery.ui.scrupload.all.js"></script>
+	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.js"></script>
 	<script type="text/javascript">
 		$(function(){
+			var cap = "10MB";
 			var limit = 3;
 			var count = {
 				html5: 0,
 				http:  0,
-				html4: 0,
-				swf:   0
+				html4: 0
 			};
 
 			$("#button_html5").scruploadHtml5({
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "1MB",
+				size_limit: cap,
 				types: "jpg|jpeg|gif|png|bmp",
 				onInit: function(event, ui)
 				{
@@ -38,7 +38,7 @@
 					display(ui.element, 'select', ui);
 					if(count.html5 >= limit)
 					{
-						return false;
+						ui.file.errors.push({type:'LIMIT', params:{limit:limit}});
 					}
 
 					++count.html5;
@@ -61,15 +61,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -88,7 +88,7 @@
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "8MB",
+				size_limit: cap,
 				types: "jpg|jpeg|gif|png|bmp",
 				onInit: function(event, ui)
 				{
@@ -103,7 +103,7 @@
 					display(ui.element, 'select', ui);
 					if(count.http >= limit)
 					{
-						return false;
+						ui.file.errors.push({type:'LIMIT', params:{limit:limit}});
 					}
 
 					++count.http;
@@ -126,15 +126,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -152,10 +152,10 @@
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
-				size_limit: "1MB",
+				size_limit: cap,
 				onInit: function(event, ui)
 				{
-					display(ui.element, 'init', ui);
+					//display(ui.element, 'init', ui);
 				},
 				onDialogClose: function(event, ui)
 				{
@@ -166,7 +166,7 @@
 					display(ui.element, 'select', ui);
 					if(count.html4 >= limit)
 					{
-						return false;
+						ui.file.errors.push({type:'LIMIT', params:{limit:limit}});
 					}
 
 					++count.html4;
@@ -189,15 +189,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -211,7 +211,7 @@
 
 
 
-			$("#button_swfuplod").scruploadSwfupload({
+			/*$("#button_swfuplod").scruploadSwfupload({
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
@@ -280,7 +280,7 @@
 				{
 					display(ui.element, 'error', ui);
 				}
-			});
+			});*/
 
 
 
@@ -289,7 +289,7 @@
 
 
 			$("#button_auto").scrupload({
-				runtimes: 'html5|swfupload|html4',
+				runtimes: 'html5|html4',
 				url: '/scrupload/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
@@ -328,15 +328,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -444,19 +444,12 @@
 <div class="display"></div>
 </div>
 
-<div>
-<h1>SWFUpload</h1>
-<div id="button_swfuplod"></div>
-<a href="javascript:void(0)" onclick="$('#button_swfuplod').scruploadSwfupload('destroy')">destroy</a>
-<div class="display"></div>
-</div>
 
 <div>
 <h1>Auto</h1>
 <div id="button_auto"></div>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'http')">http</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html4')">html4</a>
-<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'swfupload')">swfupload</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html5')">http5</a>
 <a href="javascript:void(0)" onclick="$('#button_auto').scrupload('destroy')">destroy</a>
 <div class="display"></div>
