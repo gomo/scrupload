@@ -92,12 +92,16 @@ class Scrupload_File
 				$this->_values['filename'] = $this->_getPostParam('filename');
 				$this->_size = filesize($this->_values['path']);
 			}
+			else
+			{
+				throw new Scrupload_UploadException(self::ERROR_SYSTEM, 'No file.');
+			}
 			
 			$this->_checkSize();
 		}
 		catch(Scrupload_UploadException $e)
 		{
-			$this->addErrorFromException($e);
+			$this->_addErrorFromException($e);
 		}
 		catch(Exception $e)
 		{
@@ -365,7 +369,7 @@ class Scrupload_File
 	 * 
 	 * @param Scrupload_UploadException $e
 	 */
-	public function addErrorFromException(Scrupload_UploadException $e)
+	private function _addErrorFromException(Scrupload_UploadException $e)
 	{
 		$this->addError($e->getType(), $e->getMessage(), $e->getParams());
 		return $this;
