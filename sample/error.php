@@ -39,15 +39,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -99,15 +99,15 @@
 				},
 				onButtonOver: function(event, ui)
 				{
-					display(ui.element, 'button over', ui);
+					//display(ui.element, 'button over', ui);
 				},
 				onButtonDown: function(event, ui)
 				{
-					display(ui.element, 'button down', ui);
+					//display(ui.element, 'button down', ui);
 				},
 				onButtonOut: function(event, ui)
 				{
-					display(ui.element, 'button out', ui);
+					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{

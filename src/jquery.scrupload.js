@@ -296,12 +296,40 @@ scr.submitIframForm = function(form, filename, widget, func){
 	
 	if(file.errors.length == 0)
 	{
-		self._trigger('onFileStart', null, {
+		var ret = self._trigger('onFileStart', null, {
 			element: self.element,
 			runtime: self.runtime,
 			file: file,
 			options: self.options
 		});
+		
+		var completeProccess = function(){
+			form.remove();
+			self._resetInterface();
+			self.element.removeClass("scr_uploading");
+			
+			self._trigger('onComplete', null, {
+				element: self.element,
+				uploaded: [file],
+				runtime: self.runtime,
+				options: self.options
+			});
+		};
+		
+		if(ret === false)
+		{
+			self._trigger('onFileCancel', null, {
+				element: this.element,
+				runtime: this.runtime,
+				file: file,
+				options: this.options
+			});
+			
+			completeProccess();
+			return;
+		}
+		
+		
 		
 		form.submit(function(){
 			//post params
@@ -373,21 +401,11 @@ scr.submitIframForm = function(form, filename, widget, func){
 							options: self.options
 						});
 					}
-					
-					//html4は一個しかアップロードできないので同義
-					self._trigger('onComplete', null, {
-						element: self.element,
-						uploaded: [file],
-						runtime: self.runtime,
-						options: self.options
-					});
 				}
 				
 				setTimeout(function(){
 					iframe.remove();
-					form.remove();
-					self._resetInterface();
-					self.element.removeClass("scr_uploading");
+					completeProccess();
 				}, 0);
 			});
 		
@@ -395,16 +413,7 @@ scr.submitIframForm = function(form, filename, widget, func){
 	}
 	else
 	{
-		form.remove();
-		self._resetInterface();
-		self.element.removeClass("scr_uploading");
-		
-		self._trigger('onComplete', null, {
-			element: self.element,
-			uploaded: [file],
-			runtime: self.runtime,
-			options: self.options
-		});
+		completeProccess();
 	}
 };
 

@@ -125,30 +125,40 @@ $.widget('ui.scruploadHtml5', {
 				options: self.options
 			});
 			
-			next = self.queue_array.shift();
-			if(next)
-			{
-				self._onFileStart(next);
-				self._upload(next);
-			}
-			else
-			{
-				self._onComplete();
-			}
+			self._startNext(0);
 		});
 	},
 	_upload: function(file)
 	{
-		var xhr = new XMLHttpRequest();
-		
-		this._setAjaxEventListener(xhr, file);
-		
-		xhr.open("POST", file.html5.uri);
-		xhr.send(file.html5.formData);
+		var ret = this._onFileStart(file);
+		if(ret === false)
+		{
+			this._onFileCancel(file);
+			
+			this._startNext(0);
+		}
+		else
+		{
+			var xhr = new XMLHttpRequest();
+			
+			this._setAjaxEventListener(xhr, file);
+			
+			xhr.open("POST", file.html5.uri);
+			xhr.send(file.html5.formData);
+		}
 	},
 	_onFileStart: function(file)
 	{
-		this._trigger('onFileStart', null, {
+		return this._trigger('onFileStart', null, {
+			element: this.element,
+			runtime: this.runtime,
+			file: file,
+			options: this.options
+		});
+	},
+	_onFileCancel: function(file)
+	{
+		this._trigger('onFileCancel', null, {
 			element: this.element,
 			runtime: this.runtime,
 			file: file,
@@ -207,20 +217,32 @@ $.widget('ui.scruploadHtml5', {
 				self.uploaded_array.push(file);
 			}
 			
-			
-			if(self.queue_array.length == 0)
+			self._startNext(self.options.interval);
+			/*if(self.queue_array.length == 0)
 			{
 				self._onComplete();
 			}
 			else
 			{
-				next = self.queue_array.shift();
-				self._onFileStart(next);
-				setTimeout(function(){
-					self._upload(next);
-				}, self.options.interval);
-			}
+				self._startNext(self.options.interval);
+			}*/
 		}, false);
+	},
+	_startNext: function(interval)
+	{
+		var self =this;
+		next = self.queue_array.shift();
+		
+		if(next)
+		{
+			setTimeout(function(){
+				self._upload(next);
+			}, interval);
+		}
+		else
+		{
+			self._onComplete();
+		}
 	},
 	_onComplete: function()
 	{
