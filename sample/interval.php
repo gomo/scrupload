@@ -12,7 +12,7 @@
 	<script type="text/javascript"><!--
 		$(function(){
 			$("#button_html5").scruploadHtml5({
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
@@ -64,7 +64,7 @@
 
 
 			/*$("#button_swfuplod").scruploadSwfupload({
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",

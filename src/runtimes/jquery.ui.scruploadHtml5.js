@@ -78,18 +78,11 @@ $.widget('ui.scruploadHtml5', {
 				fd.append(input_name, this.files[i]);
 				fd.append('id', file.id);
 				fd.append('post_name', input_name);
-				for(var key in file.post)
-				{
-					fd.append(key, file.post[key]);
-				}
-				
-				//GET作成
-				url = scrupload.buildUrlQuery(self.options.url, file.get);
-				form.attr("action", url);
 				
 				file.html5 = {
 					formData: fd,
-					uri: url
+					uri: self.options.url,
+					form: form
 				};
 				
 				//type check
@@ -139,6 +132,24 @@ $.widget('ui.scruploadHtml5', {
 		}
 		else
 		{
+			for(var key in file.post)
+			{
+				if($.isArray(file.post[key]))
+				{
+					$.each(file.post[key], function(){
+						file.html5.formData.append(key, this.toString());
+					});
+				}
+				else
+				{
+					file.html5.formData.append(key, file.post[key]);
+				}
+			}
+			
+			//GET作成
+			file.html5.uri = scrupload.buildUrlQuery(file.html5.uri, file.get);
+			file.html5.form.attr("action", file.html5.uri);
+			
 			var xhr = new XMLHttpRequest();
 			
 			this._setAjaxEventListener(xhr, file);

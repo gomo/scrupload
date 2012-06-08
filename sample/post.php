@@ -9,45 +9,25 @@
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.js"></script>
-	<script type="text/javascript"><!--
+	<script type="text/javascript">
 		$(function(){
+
+			var cap = "10MB";
+			
 			$("#button_html5").scruploadHtml5({
 				url: '/sample/upload.php',
-				post_params: {error_trigger: 1},
-				get_params:{huga: 456},
-				size_limit: "100MB",
+				size_limit: cap,
 				types: "jpg|jpeg|gif|png|bmp",
-				onInit: function(event, ui)
-				{
-					display(ui.element, 'init', ui);
-				},
-				onSelect: function(event, ui)
-				{
-					display(ui.element, 'select', ui);
-				},
 				onFileStart: function(event, ui)
 				{
-					display(ui.element, 'filestart', ui);
-				},
-				onProgress: function(event, ui)
-				{
-					display(ui.element, 'progress', ui);
+					ui.file.post['post[]'] = ['hoge', 'huge'];
+					ui.file.get['get[]'] = ['hoge', 'huge'];
+					
+					display(ui.element, 'file_start', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
 					display(ui.element, 'file complete', ui);
-				},
-				onButtonOver: function(event, ui)
-				{
-					//display(ui.element, 'button over', ui);
-				},
-				onButtonDown: function(event, ui)
-				{
-					//display(ui.element, 'button down', ui);
-				},
-				onButtonOut: function(event, ui)
-				{
-					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -59,55 +39,43 @@
 				}
 			});
 
-
-
-			
-
+			$("#button_http").scruploadHttp({
+				url: '/sample/upload.php',
+				size_limit: cap,
+				types: "jpg|jpeg|gif|png|bmp",
+				onFileStart: function(event, ui)
+				{
+					ui.file.post['post[]'] = ['hoge', 'huge'];
+					ui.file.get['get[]'] = ['hoge', 'huge'];
+					display(ui.element, 'file_start', ui);
+				},
+				onFileComplete: function(event, ui)
+				{
+					display(ui.element, 'file complete', ui);
+				},
+				onComplete: function(event, ui)
+				{
+					display(ui.element, 'complete', ui);
+				},
+				onError: function(event, ui)
+				{
+					display(ui.element, 'error', ui);
+				}
+			});
 
 			$("#button_html4").scruploadHtml4({
 				url: '/sample/upload.php',
-				post_params: {error_trigger: 1},
-				get_params:{huga: 456},
-				size_limit: "100MB",
-				onInit: function(event, ui)
-				{
-					display(ui.element, 'init', ui);
-				},
-				onDialogClose: function(event, ui)
-				{
-					display(ui.element, 'onDialogClose', ui);
-				},
-				onSelect: function(event, ui)
-				{
-					display(ui.element, 'select', ui);
-				},
-				onStartUpload: function(event, ui)
-				{
-					display(ui.element, 'start_upload', ui);
-				},
+				size_limit: cap,
+				types: "jpg|jpeg|gif|png|bmp",
 				onFileStart: function(event, ui)
 				{
+					ui.file.post['post[]'] = ['hoge', 'huge'];
+					ui.file.get['get[]'] = ['hoge', 'huge'];
 					display(ui.element, 'file_start', ui);
-				},
-				onProgress: function(event, ui)
-				{
-					display(ui.element, 'progress', ui);
 				},
 				onFileComplete: function(event, ui)
 				{
 					display(ui.element, 'file complete', ui);
-				},
-				onButtonOver: function(event, ui)
-				{
-					//display(ui.element, 'button over', ui);
-				},
-				onButtonDown: function(event, ui)
-				{
-					//display(ui.element, 'button down', ui);
-				},
-				onButtonOut: function(event, ui)
-				{
-					//display(ui.element, 'button out', ui);
 				},
 				onComplete: function(event, ui)
 				{
@@ -119,6 +87,7 @@
 				}
 			});
 
+		});
 		
 
 
@@ -184,8 +153,8 @@
 		{
 			return "<li>"+key+" : "+value+"</li>";
 		}
-	});
-	--></script>
+
+	</script>
 
 </head>
 <body>
@@ -194,20 +163,30 @@
 <div>
 <h1>html5</h1>
 <div id="button_html5"></div>
-<a href="javascript:void(0);" onclick="$('#button_html5').scruploadHtml5('destroy')">destroy</a>
+<a href="javascript:void(0)" onclick="$('#button_html5').scruploadHtml5('destroy')">destroy</a>
+<div class="display"></div>
+</div>
+
+<div>
+<h1>http</h1>
+<div id="button_http"></div>
+<a href="javascript:void(0)" onclick="$('#button_http').scruploadHttp('destroy')">destroy</a>
+<div class="display"></div>
+</div>
+
+<div>
+<h1>html4</h1>
+<div id="button_html4"></div>
+<a href="javascript:void(0)" onclick="$('#button_html4').scruploadHtml4('destroy')">destroy</a>
 <div class="display"></div>
 </div>
 
 
 <div>
-<h1>html4</h1>
-<div id="button_html4"></div>
-<a href="javascript:void(0);" onclick="$('#button_html4').scruploadHtml4('destroy')">destroy</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'http')">http</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html4')">html4</a>
+<a href="javascript:void(0)" onclick="$('#button_auto').scrupload('start', 'html5')">http5</a>
 <div class="display"></div>
-</div>
-
-<div style="height: 3000px">
-&nbsp;
 </div>
 
 </body>

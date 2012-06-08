@@ -20,7 +20,7 @@
 			};
 
 			$("#button_html5").scruploadHtml5({
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: cap,
@@ -85,7 +85,7 @@
 			
 			
 			$("#button_http").scruploadHttp({
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: cap,
@@ -149,7 +149,7 @@
 			
 			$("#button_html4").scruploadHtml4({
 				//html4_use_input: true,
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: cap,
@@ -212,7 +212,7 @@
 
 
 			/*$("#button_swfuplod").scruploadSwfupload({
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "1MB",
@@ -290,7 +290,7 @@
 
 			$("#button_auto").scrupload({
 				runtimes: 'html5|html4',
-				url: '/scrupload/sample/upload.php',
+				url: '/sample/upload.php',
 				post_params: {hoge: 123},
 				get_params:{huga: 456},
 				size_limit: "8MB",
