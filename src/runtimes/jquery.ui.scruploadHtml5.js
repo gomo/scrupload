@@ -8,8 +8,6 @@ $.widget('ui.scruploadHtml5', {
 		var self = this;
 		
 		self.element.addClass("scr_html5_container");
-		self.queue_array = [];
-		
 		scrupload.buildDefaultOptions(self.options);
 		
 		self._initInterface();
@@ -24,6 +22,7 @@ $.widget('ui.scruploadHtml5', {
 	{
 		var self = this;
 		
+		self.queue_array = [];
 		self.selected_array = [];
 		self.uploaded_array = [];
 		self._createFormAndInput();		
@@ -111,14 +110,21 @@ $.widget('ui.scruploadHtml5', {
 				}
 			});
 			
-			self._trigger('onStartUpload', null, {
+			var ret = self._trigger('onStartUpload', null, {
 				element: self.element,
 				runtime: self.runtime,
 				queue: self.queue_array,
 				options: self.options
 			});
 			
-			self._startNext(0);
+			if(ret === false)
+			{
+				self._onComplete();
+			}
+			else
+			{
+				self._startNext(0);
+			}
 		});
 	},
 	_upload: function(file)

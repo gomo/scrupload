@@ -287,12 +287,31 @@ scr.submitIframForm = function(form, filename, widget, func){
 	
 	scrupload.onSelect(self, file);
 	
-	self._trigger('onStartUpload', null, {
+	var completeProccess = function(){
+		form.remove();
+		self._resetInterface();
+		self.element.removeClass("scr_uploading");
+		
+		self._trigger('onComplete', null, {
+			element: self.element,
+			uploaded: [file],
+			runtime: self.runtime,
+			options: self.options
+		});
+	};
+	
+	var ret = self._trigger('onStartUpload', null, {
 		element: self.element,
 		runtime: self.runtime,
 		queue: file.errors.length === 0 ? [file] : [],
 		options: self.options
 	});
+	
+	if(ret === false)
+	{
+		completeProccess();
+		return;
+	}
 	
 	if(file.errors.length == 0)
 	{
@@ -303,18 +322,7 @@ scr.submitIframForm = function(form, filename, widget, func){
 			options: self.options
 		});
 		
-		var completeProccess = function(){
-			form.remove();
-			self._resetInterface();
-			self.element.removeClass("scr_uploading");
-			
-			self._trigger('onComplete', null, {
-				element: self.element,
-				uploaded: [file],
-				runtime: self.runtime,
-				options: self.options
-			});
-		};
+		
 		
 		if(ret === false)
 		{
