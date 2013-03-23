@@ -34,35 +34,38 @@ $.widget('ui.scruploadHtml4', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
+			var elem = this;
 			
-			var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
-				filename = 'n/a',
-				result,
-				input = $(this)
-				;
-			
-			self.element.addClass("scr_uploading");
-			
-			input.attr('name', self.options.file_post_name);
-			
-			form
-				.appendTo($("body"))
-				.append(self.container)
-				.hide();
-			
-			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
-			
-			if(this.value)
-			{
-				filename = this.value;
-				result = filename.match(/[\/\\]([^\/\\]+)$/i);
-				if (result)
+			setTimeout(function(){	
+				var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
+					filename = 'n/a',
+					result,
+					input = $(elem)
+					;
+				
+				self.element.addClass("scr_uploading");
+				
+				input.attr('name', self.options.file_post_name);
+				
+				form
+					.appendTo($("body"))
+					.append(self.container)
+					.hide();
+				
+				//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
+				
+				if(elem.value)
 				{
-					filename = result[1];
-				}	
-			}
-			
-			scrupload.submitIframForm(form, filename, self);
+					filename = elem.value;
+					result = filename.match(/[\/\\]([^\/\\]+)$/i);
+					if (result)
+					{
+						filename = result[1];
+					}	
+				}
+				
+				scrupload.submitIframForm(form, filename, self);
+			}, 0);
 		});
 	},
 	_resetInterface:function()

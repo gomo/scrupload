@@ -586,35 +586,38 @@ $.widget('ui.scruploadHtml4', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
+			var elem = this;
 			
-			var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
-				filename = 'n/a',
-				result,
-				input = $(this)
-				;
-			
-			self.element.addClass("scr_uploading");
-			
-			input.attr('name', self.options.file_post_name);
-			
-			form
-				.appendTo($("body"))
-				.append(self.container)
-				.hide();
-			
-			//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
-			
-			if(this.value)
-			{
-				filename = this.value;
-				result = filename.match(/[\/\\]([^\/\\]+)$/i);
-				if (result)
+			setTimeout(function(){	
+				var form = $('<form action="'+self.options.url+'" method="post" enctype="multipart/form-data" />'),
+					filename = 'n/a',
+					result,
+					input = $(elem)
+					;
+				
+				self.element.addClass("scr_uploading");
+				
+				input.attr('name', self.options.file_post_name);
+				
+				form
+					.appendTo($("body"))
+					.append(self.container)
+					.hide();
+				
+				//ブラウザによって得られる値が変わるので可能ならファイル名のみにする
+				
+				if(elem.value)
 				{
-					filename = result[1];
-				}	
-			}
-			
-			scrupload.submitIframForm(form, filename, self);
+					filename = elem.value;
+					result = filename.match(/[\/\\]([^\/\\]+)$/i);
+					if (result)
+					{
+						filename = result[1];
+					}	
+				}
+				
+				scrupload.submitIframForm(form, filename, self);
+			}, 0);
 		});
 	},
 	_resetInterface:function()
@@ -686,83 +689,87 @@ $.widget('ui.scruploadHtml5', {
 		scrupload.initButtonEvent(self, self.container);
 		
 		self.input.change(function(){
-			var url,
+			
+			var elem = this;
+			setTimeout(function(){
+				var url,
 				form,
 				filename = 'n/a',
 				result,
-				input = $(this),
+				input = $(elem),
 				file,
 				next
 				;
 			
-			self.input.attr('disabled', 'disabled');
-			
-			self.element.addClass("scr_uploading");
-			
-			form = $('<form method="post" enctype="multipart/form-data" />');
-			form
-				.appendTo(self.element)
-				.append(self.container);
-			
-			
-			for(var i=0; i<this.files.length; i++)
-			{
-				file = scrupload.createFile(this.files[i], self.options);
+				self.input.attr('disabled', 'disabled');
+				
+				self.element.addClass("scr_uploading");
+				
+				form = $('<form method="post" enctype="multipart/form-data" />');
+				form
+					.appendTo(self.element)
+					.append(self.container);
 				
 				
-				//postデータの作成
-				fd = new FormData();
-				fd.append(input_name, this.files[i]);
-				fd.append('id', file.id);
-				fd.append('post_name', input_name);
-				
-				file.html5 = {
-					formData: fd,
-					uri: self.options.url,
-					form: form
-				};
-				
-				//type check
-				scrupload.checkTypes(self, file);
-				
-				//size check
-				scrupload.checkSize(self, file);
-				
-				self.selected_array.push(file);
-			}
-			
-			self._trigger('onDialogClose', null, {
-				element: self.element,
-				runtime: self.runtime,
-				selected: self.selected_array,
-				options: self.options
-			});
-			
-			$.each(self.selected_array, function(){
-				var file = this;
-				scrupload.onSelect(self, file);
-				
-				if(file.errors.length == 0)
+				for(var i=0; i<elem.files.length; i++)
 				{
-					self.queue_array.push(file);
+					file = scrupload.createFile(elem.files[i], self.options);
+					
+					
+					//postデータの作成
+					fd = new FormData();
+					fd.append(input_name, elem.files[i]);
+					fd.append('id', file.id);
+					fd.append('post_name', input_name);
+					
+					file.html5 = {
+						formData: fd,
+						uri: self.options.url,
+						form: form
+					};
+					
+					//type check
+					scrupload.checkTypes(self, file);
+					
+					//size check
+					scrupload.checkSize(self, file);
+					
+					self.selected_array.push(file);
 				}
-			});
-			
-			var ret = self._trigger('onStartUpload', null, {
-				element: self.element,
-				runtime: self.runtime,
-				queue: self.queue_array,
-				options: self.options
-			});
-			
-			if(ret === false)
-			{
-				self._onComplete();
-			}
-			else
-			{
-				self._startNext(0);
-			}
+				
+				self._trigger('onDialogClose', null, {
+					element: self.element,
+					runtime: self.runtime,
+					selected: self.selected_array,
+					options: self.options
+				});
+				
+				$.each(self.selected_array, function(){
+					var file = this;
+					scrupload.onSelect(self, file);
+					
+					if(file.errors.length == 0)
+					{
+						self.queue_array.push(file);
+					}
+				});
+				
+				var ret = self._trigger('onStartUpload', null, {
+					element: self.element,
+					runtime: self.runtime,
+					queue: self.queue_array,
+					options: self.options
+				});
+				
+				if(ret === false)
+				{
+					self._onComplete();
+				}
+				else
+				{
+					self._startNext(0);
+				}
+			}, 0);
 		});
 	},
 	_upload: function(file)
