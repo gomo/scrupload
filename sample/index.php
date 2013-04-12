@@ -6,8 +6,6 @@
 	<script type="text/javascript" src="/js/sdx/lib/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/jquery.cookie.min.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/jquery-ui-1.8.7.custom.min.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/swfupload/swfupload.js"></script>
-	<script type="text/javascript" src="/js/sdx/lib/swfupload/plugins/swfupload.queue.js"></script>
 	<script type="text/javascript" src="/js/sdx/lib/scrupload/jquery.ui.scrupload.all.js"></script>
 	<script type="text/javascript">
 		$(function(){
@@ -209,85 +207,6 @@
 				}
 			});
 
-
-
-			/*$("#button_swfuplod").scruploadSwfupload({
-				url: '/sample/upload.php',
-				post_params: {hoge: 123},
-				get_params:{huga: 456},
-				size_limit: "1MB",
-				types: "jpg|gif|png|bmp",
-				mutiple_select: true,
-				swfupload: {
-					cookie: ['PHPSESSID'],
-					cookie_method: 'post',
-					button_image_url: '/img/upload_splite.gif',
-					button_width: 148,
-					button_height: 60,
-					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
-				},
-				onInit: function(event, ui)
-				{
-					display(ui.element, 'init', ui);
-				},
-				onDialogClose: function(event, ui)
-				{
-					display(ui.element, 'onDialogClose', ui);
-				},
-				onSelect: function(event, ui)
-				{
-					display(ui.element, 'select', ui);
-					if(count.swf >= limit)
-					{
-						return false;
-					}
-
-					++count.swf;
-				},
-				onStartUpload: function(event, ui)
-				{
-					display(ui.element, 'start_upload', ui);
-				},
-				onFileStart: function(event, ui)
-				{
-					display(ui.element, 'file_start', ui);
-				},
-				onProgress: function(event, ui)
-				{
-					display(ui.element, 'progress', ui);
-				},
-				onFileComplete: function(event, ui)
-				{
-					display(ui.element, 'file complete', ui);
-				},
-				onButtonOver: function(event, ui)
-				{
-					display(ui.element, 'button over', ui);
-				},
-				onButtonDown: function(event, ui)
-				{
-					display(ui.element, 'button down', ui);
-				},
-				onButtonOut: function(event, ui)
-				{
-					display(ui.element, 'button out', ui);
-				},
-				onComplete: function(event, ui)
-				{
-					display(ui.element, 'complete', ui);
-				},
-				onError: function(event, ui)
-				{
-					display(ui.element, 'error', ui);
-				}
-			});*/
-
-
-
-
-
-
-
 			$("#button_auto").scrupload({
 				runtimes: 'html5|html4',
 				url: '/sample/upload.php',
@@ -348,14 +267,6 @@
 				}
 			});
 		});
-
-
-
-		
-
-
-
-
 
 
 		//////////////////////////////////////////////
