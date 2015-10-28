@@ -215,12 +215,6 @@
 				size_limit: "8MB",
 				types: "jpg|gif|png|bmp",
 				mutiple_select: true,
-				swfupload: {
-					button_image_url: '/img/upload_splite.gif',
-					button_width: 148,
-					button_height: 60,
-					flash_url: '/js/sdx/lib/swfupload/swfupload.swf'
-				},
 				onInit: function(event, ui)
 				{
 					display(ui.element, 'init', ui);
